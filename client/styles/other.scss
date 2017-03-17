@@ -1,6 +1,5 @@
-
-
 /* Demand-Side Users */
+$slider-color: #abe2fb;
 
 .rc-slider.range {
   margin-left: 5%;
@@ -9,19 +8,21 @@
 }
 
 .rc-slider-rail {
+  // background-color: $slider-color !important;
+}
 
+.rc-slider-track {
+  background-color: $slider-color;
+}
+
+.rc-slider-handle.rc-slider-handle-1 {
+  // left: 0% !important;
 }
 
 .mean-daily {
+  padding-top: 15px;
   text-align: center;
 }
-
-/* Base Styles
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-
-
-
 
 
 /* Links
