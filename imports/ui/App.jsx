@@ -14,7 +14,10 @@ class App extends Component {
 
   renderRange() {
     return (
-      <Range className="range" min={0} max={20} defaultValue={[3, 10]} tipFormatter={value => `${value}%`} />
+      <Range className="range"
+            min={0} max={180} defaultValue={[60, 120, 180]}
+            pushable={true}
+            tipFormatter={value => `${value}`} />
     )
   }
 
@@ -23,12 +26,11 @@ class App extends Component {
       <div id="canvas">
         <div id="header-wrapper">
           <h1 className="header"> New Pueblo </h1>
+          <ul id="main-nav">
+            <li> <a href= "/"> model </a></li>
+            <li> <a href= "/"> about</a></li>
+          </ul>
         </div>
-
-        <ul id="main-nav">
-          <li> <a href= "/"> model </a></li>
-          <li> <a href= "/"> about</a></li>
-        </ul>
 
         <div className="container">
           <div className="row">
