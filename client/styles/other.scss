@@ -2,9 +2,9 @@
 @import 'variables';
 
 .rc-slider.range {
-  margin-left: 5%;
-  margin-right: 5%;
-  width: 90%;
+  // margin-left: 5%;
+  // margin-right: 5%;
+  max-width: 500px;
 }
 
 .rc-slider-rail {
@@ -20,7 +20,9 @@
 }
 
 .mean-daily {
-  padding-top: 20px;
+  padding-top: 30px;
+  margin-left: 20%;
+  margin-right: 20%;
   text-align: center;
 }
 

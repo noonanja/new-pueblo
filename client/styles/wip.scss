@@ -13,16 +13,16 @@ body {
   font-family: $font-stack;
   background-color: $background-color;
   color: $text-color;
+  white-space: nowrap;
 }
 
 #canvas {
-  /*padding: 8rem 0 7rem;*/
   max-width: 1100px;
   margin: 0 auto
 }
 
 #header-wrapper {
-  padding: 4rem 2rem 2rem 2rem;
+  // padding: 4rem 2rem 2rem 2rem;
   position: relative;
   vertical-align: middle;
   text-align: center;
@@ -52,7 +52,8 @@ body {
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: 2rem;
-  font-weight: 300; }
+  font-weight: 300;
+  white-space: nowrap;}
 h1 { font-size: 4.0rem; line-height: 1.2;  letter-spacing: .125rem;}
 #header-wrapper h1 { font-size: 4.0rem; line-height: 1.2;  letter-spacing: .125rem;}
 h2 { font-size: 3.6rem; line-height: 1.25; letter-spacing: -.1rem; }
@@ -78,4 +79,6 @@ p, input {
 
 label>p {
   margin-bottom: 0;
-  font-weight: 300; }
+  font-size: .9em;
+  font-weight: 300;
+}

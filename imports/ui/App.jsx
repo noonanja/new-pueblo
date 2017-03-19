@@ -15,8 +15,14 @@ const defaultValues= [40, 80, 120];
 const marks = {0: '0'};
 marks[activeMax]= `${activeMax}`;
 
-const defaultRequirements = 12;
-
+const defaultRequirements = 12
+    , defaultCEfficiency = 1
+    , defaultDEfficiency = 2
+    , defaultCapacity = 3
+    , defaultMaxChargeRate = 4
+    , defaultLeakRate = 5
+    , defaultMaxHourlyProduction = 6
+    , defaultMaxDailyProduction = 7;
 
 // App component - represents the whole app
 class App extends Component {
@@ -26,6 +32,13 @@ class App extends Component {
     this.state = {
       values: defaultValues,
       requirements: defaultRequirements,
+      cEfficiency: defaultCEfficiency,
+      dEfficiency: defaultDEfficiency,
+      capacity: defaultCapacity,
+      maxChargeRate: defaultMaxChargeRate,
+      leakRate: defaultLeakRate,
+      maxHourlyProduction: defaultMaxHourlyProduction,
+      maxDailyProduction: defaultMaxDailyProduction,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -80,8 +93,76 @@ class App extends Component {
         <p>Mean Daily User Energy Requirements</p>
         <input type="number" step="2" value={this.state.requirements} required
         min={defaultRequirements-4} max={defaultRequirements+4}
-        onChange={this.handleChange} />
+        onChange={this.handleChange} dir="rtl"/> kWh
       </label>
+    )
+  }
+
+  renderStorage() {
+    return (
+      <div>
+        <div className="row">
+          <label className="one-half column energyStorage">
+            <p>Charge Efficiency</p>
+            <input type="number" step="2" value={this.state.cEfficiency} required
+            min={defaultCEfficiency-4} max={defaultCEfficiency+4}
+            onChange={this.handleChange} dir="rtl"/> %
+          </label>
+
+          <label className="one-half column energyStorage">
+            <p>Discharging Efficiency</p>
+            <input type="number" step="2" value={this.state.dEfficiency} required
+            min={defaultDEfficiency-4} max={defaultDEfficiency+4}
+            onChange={this.handleChange} dir="rtl"/> %
+          </label>
+        </div>
+        <div className="row">
+          <label className="one-half column energyStorage">
+            <p>Capacity</p>
+            <input type="number" step="2" value={this.state.capacity} required
+            min={defaultCapacity-4} max={defaultCapacity+4}
+            onChange={this.handleChange} dir="rtl"/> kWh
+          </label>
+
+          <label className="one-half column energyStorage">
+            <p>Max Charge Rate</p>
+            <input type="number" step="2" value={this.state.maxChargeRate} required
+            min={defaultMaxChargeRate-4} max={defaultMaxChargeRate+4}
+            onChange={this.handleChange} dir="rtl"/> kWh per hour
+          </label>
+        </div>
+        <div className="row">
+          <label className="energyStorage">
+            <p>Leakage Rate</p>
+            <input type="number" step="2" value={this.state.leakRate} required
+            min={defaultLeakRate-4} max={defaultLeakRate+4}
+            onChange={this.handleChange} dir="rtl"/> %
+          </label>
+        </div>
+      </div>
+    )
+  }
+
+  renderProduction() {
+    return (
+      <div>
+          <div className="row">
+            <label>
+              <p>Max Hourly Production</p>
+              <input type="number" step="2" value={this.state.maxDailyProduction} required
+              min={defaultMaxDailyProduction-4} max={defaultMaxDailyProduction+4}
+              onChange={this.handleChange} dir="rtl"/> kWh
+            </label>
+          </div>
+          <div className="row">
+            <label>
+              <p>Max Daily Production</p>
+              <input type="number" step="2" value={this.state.maxDailyProduction} required
+              min={defaultMaxDailyProduction-4} max={defaultMaxDailyProduction+4}
+              onChange={this.handleChange} dir="rtl"/> kWh
+            </label>
+          </div>
+      </div>
     )
   }
 
@@ -101,16 +182,18 @@ class App extends Component {
         <div className="container">
             <div className="row">
               <h5> Demand-Side Users </h5>
-                  {this.renderRange()}
-                  {this.renderRequirements()}
+                {this.renderRange()}
+                {this.renderRequirements()}
             </div>
 
             <div className="row">
-              <div className="one-half column">
+              <div className="two-thirds column">
                 <h5> Energy Storage </h5>
+                {this.renderStorage()}
               </div>
-              <div className="one-half column">
+              <div className="one-third column">
                 <h5> Energy Production </h5>
+                {this.renderProduction()}
               </div>
             </div>
 
