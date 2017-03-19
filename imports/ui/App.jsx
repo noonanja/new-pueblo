@@ -2,10 +2,14 @@ import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import ReactDOM from 'react-dom';
+
+const Tooltip = require('rc-tooltip');
 import Slider from 'rc-slider';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
-const Range = createSliderWithTooltip(Slider.Range);
+// const Range = createSliderWithTooltip(Slider.Range);
+import Range from 'rc-slider/lib/Range';
 const Handle = Slider.Handle;
+
 import 'rc-slider/assets/index.css';
 
 const activeMax = 180;
@@ -13,12 +17,6 @@ const defaultValues= [40, 80, 120];
 const marks = {0: '0'};
 marks[activeMax]= `${activeMax}`;
 
-const handle = (props) => {
-  const {value, ...restProps} = props;
-  return (
-    <Tooltip overlay={value}> <Handle {...restProps} /> </Tooltip>
-  )
-}
 
 // App component - represents the whole app
 class App extends Component {
@@ -27,12 +25,33 @@ class App extends Component {
 
     this.state = {
       values: defaultValues,
-      handle: handle,
+      numGenStore: defaultValues[0],
+      numStore: defaultValues[1]-defaultValues[0],
+      numGen: defaultValues[2]-defaultValues[1],
     };
+  }
+
+  handle(props) {
+    const {value, dragging, index, ...restProps} = props;
+    const userValue = index==0 ? `Generator-Storers: ${value}` :
+                     (index==1 ? `Storers: ${value - this.state.values[index-1]}` :
+                                 `Generators: ${value - this.state.values[index-1]}`);
+    return (
+      <Tooltip
+        prefixCls="rc-slider-tooltip"
+        overlay={userValue}
+        visible={dragging}
+        placement="top"
+        key={index}
+      >
+      <Handle {...restProps} />
+      </Tooltip>
+    )
   }
 
   updateTipValues(values) {
     this.setState({
+      values: values,
       numGenStore: values[0],
       numStore: values[1]-values[0],
       numGen: values[2]-values[1],
@@ -43,9 +62,12 @@ class App extends Component {
     return (
       <Range
         className="range" min={0} max={activeMax} defaultValue={defaultValues}
-        pushable={true} step= {5} included={false} marks = {marks}
-        handle= {this.state.handle} tipFormatter= {value => `${value}`}
+        pushable={true} step={5} included={false} marks ={marks}
+        ref= "range"
+        handle= {this.handle.bind(this)}
+        onChange= {this.updateTipValues.bind(this)}
         onAfterChange={this.updateTipValues.bind(this)} />
+
     )
   }
 
