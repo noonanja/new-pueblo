@@ -3,12 +3,11 @@ import { createContainer } from 'meteor/react-meteor-data';
 
 import ReactDOM from 'react-dom';
 
-const Tooltip = require('rc-tooltip');
-import Slider from 'rc-slider';
-const createSliderWithTooltip = Slider.createSliderWithTooltip;
-// const Range = createSliderWithTooltip(Slider.Range);
 import Range from 'rc-slider/lib/Range';
+import Slider from 'rc-slider';
 const Handle = Slider.Handle;
+const Tooltip = require('rc-tooltip');
+
 
 import 'rc-slider/assets/index.css';
 
@@ -25,22 +24,18 @@ class App extends Component {
 
     this.state = {
       values: defaultValues,
-      numGenStore: defaultValues[0],
-      numStore: defaultValues[1]-defaultValues[0],
-      numGen: defaultValues[2]-defaultValues[1],
     };
   }
 
   handle(props) {
     const {value, dragging, index, ...restProps} = props;
-    const userValue = index==0 ? `Generator-Storers: ${value}` :
-                     (index==1 ? `Storers: ${value - this.state.values[index-1]}` :
-                                 `Generators: ${value - this.state.values[index-1]}`);
+    const userValue = index==0 ? ` Generator-Storers: ${value} ` :
+                     (index==1 ? ` Storers: ${value - this.state.values[index-1]} ` :
+                                 ` Generators: ${value - this.state.values[index-1]} `);
     return (
       <Tooltip
         prefixCls="rc-slider-tooltip"
         overlay={userValue}
-        visible={dragging}
         placement="top"
         key={index}
       >
@@ -52,9 +47,6 @@ class App extends Component {
   updateTipValues(values) {
     this.setState({
       values: values,
-      numGenStore: values[0],
-      numStore: values[1]-values[0],
-      numGen: values[2]-values[1],
     });
   }
 
@@ -66,8 +58,7 @@ class App extends Component {
         ref= "range"
         handle= {this.handle.bind(this)}
         onChange= {this.updateTipValues.bind(this)}
-        onAfterChange={this.updateTipValues.bind(this)} />
-
+        />
     )
   }
 
