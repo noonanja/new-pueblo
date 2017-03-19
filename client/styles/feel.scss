@@ -46,6 +46,7 @@ body {
   padding: 0 .8em
 }
 
+
 /* Typography
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 h1, h2, h3, h4, h5, h6 {
@@ -71,6 +72,10 @@ h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
   h6 { font-size: 1.5rem; }
 }
 
-p {
+p, input {
   margin-top: 0;
 }
+
+label>p {
+  margin-bottom: 0;
+  font-weight: 300; }
