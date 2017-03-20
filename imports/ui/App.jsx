@@ -70,10 +70,12 @@ class App extends Component {
 
   renderRange() {
     return (
-      <Range
-        handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
-        ref= "range" className="range" min={0} max={activeMax} pushable={true}
-        defaultValue={defaultValues} step={5} included={false} marks ={marks} />
+        <div className="range">
+        <Range
+          handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
+          ref= "range" min={0} max={activeMax} pushable={true}
+          defaultValue={defaultValues} step={5} included={false} marks ={marks} />
+        </div>
     )
   }
 
@@ -149,8 +151,8 @@ class App extends Component {
           <div className="row">
             <label>
               <p>Max Hourly Production</p>
-              <input type="number" step="2" value={this.state.maxDailyProduction} required
-              min={defaultMaxDailyProduction-4} max={defaultMaxDailyProduction+4}
+              <input type="number" step="2" value={this.state.maxHourlyProduction} required
+              min={defaultMaxHourlyProduction-4} max={defaultMaxHourlyProduction+4}
               onChange={this.handleChange} dir="rtl"/> kWh
             </label>
           </div>
@@ -187,12 +189,12 @@ class App extends Component {
             </div>
 
             <div className="row">
-              <div className="two-thirds column">
-                <h5> Energy Storage </h5>
+              <div className="two-thirds column grid-constraints">
+                <h5> Storage </h5>
                 {this.renderStorage()}
               </div>
-              <div className="one-third column">
-                <h5> Energy Production </h5>
+              <div className="one-third column grid-constraints">
+                <h5> Production </h5>
                 {this.renderProduction()}
               </div>
             </div>
