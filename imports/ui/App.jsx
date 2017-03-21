@@ -3,6 +3,9 @@ import { createContainer } from 'meteor/react-meteor-data';
 
 import ReactDOM from 'react-dom';
 
+import ChartAgg from './ChartAgg.jsx';
+import ChartPrice from './ChartPrice.jsx';
+
 
 import Range from 'rc-slider/lib/Range';
 import Slider from 'rc-slider';
@@ -23,6 +26,33 @@ const defaultRequirements = 12
     , defaultLeakRate = 5
     , defaultMaxHourlyProduction = 6
     , defaultMaxDailyProduction = 7;
+
+const aggData = {
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    datasets: [
+        {
+            label: "My First dataset",
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1,
+            data: [65, 59, 80, 81, 56, 55, 40],
+        }
+    ]
+};
 
 // App component - represents the whole app
 class App extends Component {
@@ -168,6 +198,14 @@ class App extends Component {
     )
   }
 
+  renderChartAgg() {
+    return <ChartAgg data={aggData}/>
+  }
+
+  renderChartPrice() {
+    return <ChartPrice data={aggData}/>
+  }
+
   render() {
     // <form onSubmit={this.handleSubmit()}>
     // </form>
@@ -189,23 +227,31 @@ class App extends Component {
             </div>
 
             <div className="row">
-              <div className="two-thirds column grid-constraints">
+              <div className="two-thirds column">
                 <h5> Storage </h5>
                 {this.renderStorage()}
               </div>
-              <div className="one-third column grid-constraints">
+              <div className="one-third column">
                 <h5> Production </h5>
                 {this.renderProduction()}
               </div>
             </div>
 
-            <div className="row">
+            <div className="row chart-section">
               <div className="one-half column">
-                <h5> Aggregate Load </h5>
+                <h6 className="graph-header"> Aggregate Load </h6>
+                {this.renderChartAgg()}
               </div>
               <div className="one-half column">
-                <h5> Price/ Unit Energy </h5>
+                <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
+                {this.renderChartPrice()}
               </div>
+            </div>
+
+            <div className="row footer-wrapper">
+              <footer id="footer" >
+                © 2017 Jacob Noonan
+              </footer>
             </div>
 
         </div>
@@ -216,8 +262,7 @@ class App extends Component {
 }
 
 App.propTypes = {
-  // value: PropTypes.number.isRequired,
-  // tasks: PropTypes.array.isRequired,
+  // aggData: PropTypes.object.isRequired,
 };
 
 export default createContainer(() => {

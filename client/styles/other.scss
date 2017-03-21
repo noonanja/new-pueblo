@@ -26,6 +26,34 @@
   text-align: center;
 }
 
+.chart-section {
+  margin-top: .8rem;
+  padding-top: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: center;
+  background-color: $chart-background-color;
+}
+
+
+.footer-wrapper {
+  padding-top: 100px;
+
+}
+
+#footer {
+  text-align: center;
+}
+
+footer:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+
 
 /* Links
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -111,8 +139,8 @@ select {
   padding: 0px 5px 0px; /* The 6px vertically centers text on FF, ignored by Webkit */
   margin: 0;
   color: $text-color;
-  background-color: $constraint-background-color;
-  border: 1px solid $constraint-background-color;
+  background-color: $background-color;
+  border: 1px solid $background-color;
   border-radius: 4px;
   box-shadow: none;
   box-sizing: border-box; }
