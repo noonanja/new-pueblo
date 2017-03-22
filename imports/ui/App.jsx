@@ -110,23 +110,13 @@ class App extends Component {
     )
   }
 
-  handleChange(event) {
-    this.setState({requirements: event.target.value});
-  }
-
-  handleSubmit(event) {
-    alert('Form was completed: ' + this.state.requirements);
-    event.preventDefault();
-  }
-
   renderRequirements() {
-    // <input type="submit" value="Submit" />
     return (
       <label className="mean-daily">
         <p>Mean Daily User Energy Requirements</p>
         <input type="number" step="2" value={this.state.requirements} required
         min={defaultRequirements-4} max={defaultRequirements+4}
-        onChange={this.handleChange} dir="rtl"/> kWh
+        name= "requirements" onChange={this.handleChange} dir="rtl"/> kWh
       </label>
     )
   }
@@ -139,14 +129,14 @@ class App extends Component {
             <p>Charge Efficiency</p>
             <input type="number" step="2" value={this.state.cEfficiency} required
             min={defaultCEfficiency-4} max={defaultCEfficiency+4}
-            onChange={this.handleChange} dir="rtl"/> %
+            name= "cEfficiency" onChange={this.handleChange} dir="rtl"/> %
           </label>
 
           <label className="one-half column energyStorage">
             <p>Discharging Efficiency</p>
             <input type="number" step="2" value={this.state.dEfficiency} required
             min={defaultDEfficiency-4} max={defaultDEfficiency+4}
-            onChange={this.handleChange} dir="rtl"/> %
+            name= "dEfficiency" onChange={this.handleChange} dir="rtl"/> %
           </label>
         </div>
         <div className="row">
@@ -154,14 +144,14 @@ class App extends Component {
             <p>Capacity</p>
             <input type="number" step="2" value={this.state.capacity} required
             min={defaultCapacity-4} max={defaultCapacity+4}
-            onChange={this.handleChange} dir="rtl"/> kWh
+            name= "capacity" onChange={this.handleChange} dir="rtl"/> kWh
           </label>
 
           <label className="one-half column energyStorage">
             <p>Max Charge Rate</p>
             <input type="number" step="2" value={this.state.maxChargeRate} required
             min={defaultMaxChargeRate-4} max={defaultMaxChargeRate+4}
-            onChange={this.handleChange} dir="rtl"/> kWh per hour
+            name= "maxChargeRate" onChange={this.handleChange} dir="rtl"/> kWh per hour
           </label>
         </div>
         <div className="row">
@@ -169,7 +159,7 @@ class App extends Component {
             <p>Leakage Rate</p>
             <input type="number" step="2" value={this.state.leakRate} required
             min={defaultLeakRate-4} max={defaultLeakRate+4}
-            onChange={this.handleChange} dir="rtl"/> %
+            name= "leakRate" onChange={this.handleChange} dir="rtl"/> %
           </label>
         </div>
       </div>
@@ -184,7 +174,7 @@ class App extends Component {
               <p>Max Hourly Production</p>
               <input type="number" step="2" value={this.state.maxHourlyProduction} required
               min={defaultMaxHourlyProduction-4} max={defaultMaxHourlyProduction+4}
-              onChange={this.handleChange} dir="rtl"/> kWh
+              name= "maxHourlyProduction" onChange={this.handleChange} dir="rtl"/> kWh
             </label>
           </div>
           <div className="row">
@@ -192,7 +182,7 @@ class App extends Component {
               <p>Max Daily Production</p>
               <input type="number" step="2" value={this.state.maxDailyProduction} required
               min={defaultMaxDailyProduction-4} max={defaultMaxDailyProduction+4}
-              onChange={this.handleChange} dir="rtl"/> kWh
+              name= "maxDailyProduction" onChange={this.handleChange} dir="rtl"/> kWh
             </label>
           </div>
       </div>
@@ -207,9 +197,20 @@ class App extends Component {
     return <ChartPrice data={priceData}/>
   }
 
+  handleChange(event) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+    this.setState({[name]: value});
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    console.log(this.state)
+    // alert('Form was completed: ' + this.state.requirements);
+  }
+
   render() {
-    // <form onSubmit={this.handleSubmit()}>
-    // </form>
     return (
       <div id="canvas">
         <div id="header-wrapper">
@@ -222,7 +223,9 @@ class App extends Component {
 
         <div className="container">
             <div className="row">
-              <span className="u-pull-right"> Run Model </span>
+              <form onSubmit={this.handleSubmit}>
+                <input type="submit" id="run" className="u-pull-right" value="run" />
+              </form>
               <h5> Demand-Side Users </h5>
                 {this.renderRange()}
                 {this.renderRequirements()}

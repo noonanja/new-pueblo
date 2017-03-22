@@ -25,7 +25,5 @@ export default class ChartAgg extends Component {
 }
 
 ChartAgg.propTypes = {
-  // This component gets the task to display through a React prop.
-  // We can use propTypes to indicate it is required
   data: PropTypes.object.isRequired,
 };
