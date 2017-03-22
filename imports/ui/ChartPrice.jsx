@@ -2,19 +2,21 @@ import React, { Component, PropTypes } from 'react';
 
 const BarChart = require("react-chartjs").Bar;
 
-const priceOptions = { scales:
-                  {
-                    xAxes: [{stacked: true}],
-                    yAxes: [{stacked: true}]
-                  },
-                  responsive: true,
-              };
+const priceOptions = { scales: {
+                          xAxes: [{stacked: true}],
+                          yAxes: [{stacked: true}],
+                          ticks: {
+                            autoSkipPadding: 10,
+                          },
+                      },
+                      responsive: true,
+};
 
 export default class ChartPrice extends Component {
 
   render() {
     return (
-      <BarChart data={this.props.data} options={priceOptions}  />
+      <BarChart data={this.props.data} options={priceOptions} />
   )}
 }
 
