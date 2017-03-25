@@ -1,7 +1,12 @@
 import React, { Component, PropTypes } from 'react';
-import { createContainer } from 'meteor/react-meteor-data';
-
 import ReactDOM from 'react-dom';
+import { Meteor } from 'meteor/meteor';
+
+// to use react-meteor-data (allowing us to use data from a Meteor collection
+// inside a React component), we need to wrap our component in a container using
+// the createContainer Higher Order Component
+import { createContainer } from 'meteor/react-meteor-data';
+import { Users } from '../api/users.js';
 
 import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';
@@ -206,8 +211,17 @@ class App extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log(this.state)
-    // alert('Form was completed: ' + this.state.requirements);
+    Meteor.call('users.simulate',
+      this.state.userTypes,
+      this.state.requirements,
+      this.state.cEfficiency,
+      this.state.dEfficiency,
+      this.state.capacity,
+      this.state.maxChargeRate,
+      this.state.leakRate,
+      this.state.maxHourlyProduction,
+      this.state.maxDailyProduction);
+    // console.log(this.state)
   }
 
   render() {
@@ -267,11 +281,12 @@ class App extends Component {
 }
 
 App.propTypes = {
-  // aggData: PropTypes.object.isRequired,
+  users: PropTypes.array.isRequired,
 };
 
 export default createContainer(() => {
+  Meteor.subscribe('users');
   return {
-    // tasks: Tasks.find({}).fetch(),
+    users: Users.find({}).fetch(),
   };
 }, App);
