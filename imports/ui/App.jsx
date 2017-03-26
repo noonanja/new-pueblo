@@ -211,8 +211,11 @@ class App extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    Meteor.call('users.simulate', this.state);
-    // console.log(this.state)
+    Meteor.call('users.simulate', this.state, (err, res) => {
+      if (err) {
+        alert(err);
+      }
+    });
   }
 
   render() {

@@ -1,10 +1,24 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-import { check } from 'meteor/check';
 
-// export const Users = new Mongo.Collection('users'); // Mongo server Collection
-export const Users = new Mongo.Collection(null); // local Collection
+import { simulate } from './methods.js';
 
+export const Users = new Mongo.Collection('users'); // Mongo server Collection
+// export const Users = new Mongo.Collection(null); // local Collection
+
+Users.schema = new SimpleSchema({
+  _id: { type: String, regEx: SimpleSchema.RegEx.Id },
+  hasStore: { type: Boolean },
+  hasGen: { type: Boolean },
+});
+Users.attachSchema(Users.schema);
+
+// Deny all client-side updates since we will be using methods to manage this collection
+Users.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; },
+});
 
 if (Meteor.isServer) {
   // This code only runs on the server
@@ -14,59 +28,9 @@ if (Meteor.isServer) {
 }
 
 Meteor.methods({
-  'users.simulate' ({userTypes, requirements, cEfficiency, dEfficiency,
-                    capacity, maxChargeRate, leakRate, maxHourlyProduction,
-                    maxDailyProduction}) {
-    new SimpleSchema({
-      userTypes: {type: [Number]},
-      requirements: {type: Number},
-      cEfficiency: {type: Number},
-      dEfficiency: {type: Number},
-      capacity: {type: Number},
-      maxChargeRate: {type: Number},
-      leakRate: {type: Number},
-      maxHourlyProduction: {type: Number},
-      maxDailyProduction: {type: Number},
-    }).validate({userTypes, requirements, cEfficiency, dEfficiency, capacity,
-                maxChargeRate, leakRate, maxHourlyProduction, maxDailyProduction});
-
-    // Make sure the user is logged in before inserting a task
-    // if (! Meteor.userId()) {
-    //   throw new Meteor.Error('not-authorized');
-    // }
-
-    Users.remove({});
-
-    // insert storers
-    for(i = 1; i <= userTypes[0]; i++) {
-      Users.insert({
-        id: i,
-        hasStore: true,
-        hasGen: true,
-        // e_n: drawConsumption()
-      });
-    }
-
-    for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
-      Users.insert({
-        id: i,
-        hasStore: true,
-        hasGen: false,
-        // e_n: drawConsumption()
-      });
-    }
-
-    for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
-      Users.insert({
-        id: i,
-        hasStore: false,
-        hasGen: true,
-        // e_n: drawConsumption()
-      });
-    }
-
-    console.log(Users.find().count());
-
+  [simulate.name]: function(args) {
+    simulate.validate.call(this, args);
+    simulate.run.call(this, args);
   },
 
 });
