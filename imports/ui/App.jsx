@@ -19,7 +19,7 @@ const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
 const activeMax = 180;
-const defaultValues= [40, 80, 120];
+const defaultUserTypes= [40, 80, 120];
 const marks = {0: '0'};
 marks[activeMax]= `${activeMax}`;
 
@@ -66,7 +66,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      values: defaultValues,
+      userTypes: defaultUserTypes,
       requirements: defaultRequirements,
       cEfficiency: defaultCEfficiency,
       dEfficiency: defaultDEfficiency,
@@ -84,8 +84,8 @@ class App extends Component {
   handle(props) {
     const {value, dragging, index, ...restProps} = props;
     const userValue = index==0 ? ` Generator-Storers: ${value} ` :
-                     (index==1 ? ` Storers: ${value - this.state.values[index-1]} ` :
-                                 ` Generators: ${value - this.state.values[index-1]} `);
+                     (index==1 ? ` Storers: ${value - this.state.userTypes[index-1]} ` :
+                                 ` Generators: ${value - this.state.userTypes[index-1]} `);
     return (
       <Tooltip
         prefixCls="rc-slider-tooltip"
@@ -100,7 +100,7 @@ class App extends Component {
 
   updateTipValues(values) {
     this.setState({
-      values: values,
+      userTypes: userTypes,
     });
   }
 
@@ -110,7 +110,7 @@ class App extends Component {
         <Range
           handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
           ref= "range" min={0} max={activeMax} pushable={true}
-          defaultValue={defaultValues} step={5} included={false} marks ={marks} />
+          defaultValue={defaultUserTypes} step={5} included={false} marks ={marks} />
         </div>
     )
   }
@@ -211,16 +211,7 @@ class App extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    Meteor.call('users.simulate',
-      this.state.userTypes,
-      this.state.requirements,
-      this.state.cEfficiency,
-      this.state.dEfficiency,
-      this.state.capacity,
-      this.state.maxChargeRate,
-      this.state.leakRate,
-      this.state.maxHourlyProduction,
-      this.state.maxDailyProduction);
+    Meteor.call('users.simulate', this.state);
     // console.log(this.state)
   }
 
