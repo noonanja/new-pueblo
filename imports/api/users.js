@@ -26,11 +26,3 @@ if (Meteor.isServer) {
     return Users.find();
   });
 }
-
-Meteor.methods({
-  [simulate.name]: function(args) {
-    simulate.validate.call(this, args);
-    simulate.run.call(this, args);
-  },
-
-});

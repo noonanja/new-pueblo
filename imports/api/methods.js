@@ -1,24 +1,19 @@
 import { Users } from './users.js';
+import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
-export const simulate = {
+export const simulate = new ValidatedMethod({
   name: 'users.simulate',
-
-   // Validation can be run independently
-  validate(args) {
-    new SimpleSchema({
-      userTypes: {type: [Number]},
-      requirements: {type: Number},
-      cEfficiency: {type: Number},
-      dEfficiency: {type: Number},
-      capacity: {type: Number},
-      maxChargeRate: {type: Number},
-      leakRate: {type: Number},
-      maxHourlyProduction: {type: Number},
-      maxDailyProduction: {type: Number},
-    }).validate(args);
-  },
-
-  // Method body can be called independently
+  validate: new SimpleSchema({
+    userTypes: {type: [Number]},
+    requirements: {type: Number},
+    cEfficiency: {type: Number},
+    dEfficiency: {type: Number},
+    capacity: {type: Number},
+    maxChargeRate: {type: Number},
+    leakRate: {type: Number},
+    maxHourlyProduction: {type: Number},
+    maxDailyProduction: {type: Number},
+  }).validator(),
   run({userTypes, requirements, cEfficiency, dEfficiency, capacity, maxChargeRate,
        leakRate, maxHourlyProduction, maxDailyProduction}) {
 
@@ -58,12 +53,4 @@ export const simulate = {
 
   },
 
-  // Call Method by referencing the JS object
-  call(args, callback) {
-    const options = {
-      returnStubValue: true,     // (5)
-      throwStubExceptions: true  // (6)
-    }
-    Meteor.apply(this.name, [args], options, callback);
-  }
-};
+});
