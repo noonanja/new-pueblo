@@ -1,6 +1,9 @@
 import { Users } from './users.js';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
+import { drawConsumption } from './hourlyStats.js';
+
+
 export const simulate = new ValidatedMethod({
   name: 'users.simulate',
   validate: new SimpleSchema({
@@ -14,6 +17,7 @@ export const simulate = new ValidatedMethod({
     maxHourlyProduction: {type: Number},
     maxDailyProduction: {type: Number},
   }).validator(),
+
   run({userTypes, requirements, cEfficiency, dEfficiency, capacity, maxChargeRate,
        leakRate, maxHourlyProduction, maxDailyProduction}) {
 
@@ -24,15 +28,18 @@ export const simulate = new ValidatedMethod({
 
     Users.remove({});   // PLACEHOLDER UNTIL NEWLY DEFINED USERS
 
-    // insert storers
+    // insert storer-generators
     for(i = 1; i <= userTypes[0]; i++) {
-      Users.insert({
+      x = {
         hasStore: true,
         hasGen: true,
-        // e_n: drawConsumption()
-      });
+        e_n: drawConsumption(),
+      };
+      console.log(x);
+      Users.insert(x);
     }
 
+    // insert storers
     for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
       Users.insert({
         hasStore: true,
@@ -41,6 +48,7 @@ export const simulate = new ValidatedMethod({
       });
     }
 
+    // insert generators
     for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
       Users.insert({
         hasStore: false,
