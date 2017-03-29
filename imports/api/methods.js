@@ -1,13 +1,13 @@
-import { Users } from './users.js';
+import { Loads } from './loads.js';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
 import { drawConsumption } from './hourlyStats.js';
 
 
 export const simulate = new ValidatedMethod({
-  name: 'users.simulate',
+  name: 'loads.simulate',
   validate: new SimpleSchema({
-    userTypes: {type: [Number]},
+    loadTypes: {type: [Number]},
     requirements: {type: Number},
     cEfficiency: {type: Number},
     dEfficiency: {type: Number},
@@ -18,7 +18,7 @@ export const simulate = new ValidatedMethod({
     maxDailyProduction: {type: Number},
   }).validator(),
 
-  run({userTypes, requirements, cEfficiency, dEfficiency, capacity, maxChargeRate,
+  run({loadTypes, requirements, cEfficiency, dEfficiency, capacity, maxChargeRate,
        leakRate, maxHourlyProduction, maxDailyProduction}) {
 
     // if (!todo.editableBy(this.userId)) {
@@ -29,35 +29,33 @@ export const simulate = new ValidatedMethod({
     Users.remove({});   // PLACEHOLDER UNTIL NEWLY DEFINED USERS
 
     // insert storer-generators
-    for(i = 1; i <= userTypes[0]; i++) {
-      x = {
+    for(i = 1; i <= loadTypes[0]; i++) {
+      Loads.insert({
         hasStore: true,
         hasGen: true,
         e_n: drawConsumption(),
-      };
-      console.log(x);
-      Users.insert(x);
+      });
     }
 
     // insert storers
-    for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
-      Users.insert({
+    for(i = loadTypes[0]+1; i <= loadTypes[1]; i++) {
+      Loads.insert({
         hasStore: true,
         hasGen: false,
-        // e_n: drawConsumption()
+        e_n: drawConsumption()
       });
     }
 
     // insert generators
-    for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
-      Users.insert({
+    for(i = loadTypes[1]+1; i <= loadTypes[2]; i++) {
+      Loads.insert({
         hasStore: false,
         hasGen: true,
-        // e_n: drawConsumption()
+        e_n: drawConsumption()
       });
     }
 
-    console.log(Users.find().count());
+    console.log(Loads.find().count());
 
   },
 
