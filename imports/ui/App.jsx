@@ -6,7 +6,7 @@ import { Meteor } from 'meteor/meteor';
 // inside a React component), we need to wrap our component in a container using
 // the createContainer Higher Order Component
 import { createContainer } from 'meteor/react-meteor-data';
-import { Loads } from '../api/loads.js';
+import { Users } from '../api/users.js';
 
 import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';
@@ -19,7 +19,7 @@ const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
 const activeMax = 180;
-const defaultLoadTypes= [40, 80, 120];
+const defaultUserTypes= [40, 80, 120];
 const marks = {0: '0'};
 marks[activeMax]= `${activeMax}`;
 
@@ -66,7 +66,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      loadTypes: defaultLoadTypes,
+      userTypes: defaultUserTypes,
       requirements: defaultRequirements,
       cEfficiency: defaultCEfficiency,
       dEfficiency: defaultDEfficiency,
@@ -84,8 +84,8 @@ class App extends Component {
   handle(props) {
     const {value, dragging, index, ...restProps} = props;
     const userValue = index==0 ? ` Generator-Storers: ${value} ` :
-                     (index==1 ? ` Storers: ${value - this.state.loadTypes[index-1]} ` :
-                                 ` Generators: ${value - this.state.loadTypes[index-1]} `);
+                     (index==1 ? ` Storers: ${value - this.state.userTypes[index-1]} ` :
+                                 ` Generators: ${value - this.state.userTypes[index-1]} `);
     return (
       <Tooltip
         prefixCls="rc-slider-tooltip"
@@ -100,7 +100,7 @@ class App extends Component {
 
   updateTipValues(values) {
     this.setState({
-      loadTypes: values,
+      userTypes: userTypes,
     });
   }
 
@@ -110,7 +110,7 @@ class App extends Component {
         <Range
           handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
           ref= "range" min={0} max={activeMax} pushable={true}
-          defaultValue={defaultLoadTypes} step={5} included={false} marks ={marks} />
+          defaultValue={defaultUserTypes} step={5} included={false} marks ={marks} />
         </div>
     )
   }
@@ -211,7 +211,7 @@ class App extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    Meteor.call('loads.simulate', this.state, (err, res) => {
+    Meteor.call('users.simulate', this.state, (err, res) => {
       if (err) {
         alert(err);
       }
@@ -275,12 +275,12 @@ class App extends Component {
 }
 
 App.propTypes = {
-  loads: PropTypes.array.isRequired,
+  users: PropTypes.array.isRequired,
 };
 
 export default createContainer(() => {
-  Meteor.subscribe('loads');
+  Meteor.subscribe('users');
   return {
-    loads: Loads.find({}).fetch(),
+    users: Users.find({}).fetch(),
   };
 }, App);

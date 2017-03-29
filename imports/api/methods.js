@@ -1,11 +1,11 @@
-import { Loads } from './loads.js';
+import { Users } from './users.js';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
 import { drawConsumption } from './hourlyStats.js';
 
 
 export const simulate = new ValidatedMethod({
-  name: 'loads.simulate',
+  name: 'users.simulate',
   validate: new SimpleSchema({
     userTypes: {type: [Number]},
     requirements: {type: Number},
@@ -26,11 +26,11 @@ export const simulate = new ValidatedMethod({
     //     'Cannot edit todos in a private list that is not yours');
     // }
 
-    Loads.remove({});   // PLACEHOLDER UNTIL NEWLY DEFINED USERS
+    Users.remove({});   // PLACEHOLDER UNTIL NEWLY DEFINED USERS
 
     // insert storer-generators
     for(i = 1; i <= userTypes[0]; i++) {
-      Loads.insert({
+      Users.insert({
         hasStore: true,
         hasGen: true,
         e_n: drawConsumption(),
@@ -39,7 +39,7 @@ export const simulate = new ValidatedMethod({
 
     // insert storers
     for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
-      Loads.insert({
+      Users.insert({
         hasStore: true,
         hasGen: false,
         e_n: drawConsumption()
@@ -48,14 +48,12 @@ export const simulate = new ValidatedMethod({
 
     // insert generators
     for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
-      Loads.insert({
+      Users.insert({
         hasStore: false,
         hasGen: true,
         e_n: drawConsumption()
       });
     }
-
-    console.log(Loads.find().count());
 
   },
 
