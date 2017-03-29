@@ -7,7 +7,7 @@ import { drawConsumption } from './hourlyStats.js';
 export const simulate = new ValidatedMethod({
   name: 'loads.simulate',
   validate: new SimpleSchema({
-    loadTypes: {type: [Number]},
+    userTypes: {type: [Number]},
     requirements: {type: Number},
     cEfficiency: {type: Number},
     dEfficiency: {type: Number},
@@ -18,7 +18,7 @@ export const simulate = new ValidatedMethod({
     maxDailyProduction: {type: Number},
   }).validator(),
 
-  run({loadTypes, requirements, cEfficiency, dEfficiency, capacity, maxChargeRate,
+  run({userTypes, requirements, cEfficiency, dEfficiency, capacity, maxChargeRate,
        leakRate, maxHourlyProduction, maxDailyProduction}) {
 
     // if (!todo.editableBy(this.userId)) {
@@ -26,10 +26,10 @@ export const simulate = new ValidatedMethod({
     //     'Cannot edit todos in a private list that is not yours');
     // }
 
-    Users.remove({});   // PLACEHOLDER UNTIL NEWLY DEFINED USERS
+    Loads.remove({});   // PLACEHOLDER UNTIL NEWLY DEFINED USERS
 
     // insert storer-generators
-    for(i = 1; i <= loadTypes[0]; i++) {
+    for(i = 1; i <= userTypes[0]; i++) {
       Loads.insert({
         hasStore: true,
         hasGen: true,
@@ -38,7 +38,7 @@ export const simulate = new ValidatedMethod({
     }
 
     // insert storers
-    for(i = loadTypes[0]+1; i <= loadTypes[1]; i++) {
+    for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
       Loads.insert({
         hasStore: true,
         hasGen: false,
@@ -47,7 +47,7 @@ export const simulate = new ValidatedMethod({
     }
 
     // insert generators
-    for(i = loadTypes[1]+1; i <= loadTypes[2]; i++) {
+    for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
       Loads.insert({
         hasStore: false,
         hasGen: true,

@@ -10,11 +10,12 @@ export const Loads = new Mongo.Collection('loads'); // Mongo server Collection
 Schema = {}
 Schema.loads = new SimpleSchema({
   _id: { type: String, regEx: SimpleSchema.RegEx.Id },
+  userId: { type: String, regEx: SimpleSchema.RegEx.Id, optional: true }, // _id of User
   hasStore: { type: Boolean },
   hasGen: { type: Boolean },
   e_n: { type: [Number], decimal: true },
-  s_n: { type: [Number], decimal: true, optional: true },
-  g_n: { type: [Number], decimal: true, optional: true },
+  // s_n: { type: [Number], decimal: true, optional: true },
+  // g_n: { type: [Number], decimal: true, optional: true },
 });
 Loads.attachSchema(Schema.loads);
 
