@@ -4,13 +4,11 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method';
 export const insertUser = new ValidatedMethod({
   name: 'users.insert',
   validate: new SimpleSchema({
-      userId: {type: Number},
       hasStore: {type: Boolean},
       hasGen: {type: Boolean}
   }).validator(),
-  run({userId, hasStore, hasGen}) {
+  run({hasStore, hasGen}) {
     return Users.insert({
-      userId: userId,
       hasStore: hasStore,
       hasGen: hasGen
     });
@@ -42,15 +40,15 @@ export const simulate = new ValidatedMethod({
 
     // insert storer-generators
     for(i = 1; i <= userTypes[0]; i++) {
-      Meteor.call("users.insert", {userId:i, hasStore:true, hasGen:true});
+      Meteor.call("users.insert", {hasStore:true, hasGen:true});
     }
     // insert storers
     for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
-      Meteor.call("users.insert", {userId:i, hasStore:true, hasGen:false});
+      Meteor.call("users.insert", {hasStore:true, hasGen:false});
     }
     // insert generators
     for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
-      Meteor.call("users.insert", {userId:i, hasStore:false, hasGen:true});
+      Meteor.call("users.insert", {hasStore:false, hasGen:true});
     }
 
   },

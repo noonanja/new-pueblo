@@ -7,9 +7,9 @@ import {simulate} from './userMethods.js'
 import { drawConsumption } from '../loads/hourlyStats.js';
 
 const loadsDenormalizer = {
-  afterInsertUser(user) {
+  afterInsertUser(userId) {
     Loads.insert({
-      userId: user.userId,
+      userId: userId,
       e_n: drawConsumption()
     });
   }
@@ -20,7 +20,7 @@ class UsersCollection extends Mongo.Collection {
     // Call the original `insert` method, which will validate
     // against the schema
     const result = super.insert(user, callback);
-    loadsDenormalizer.afterInsertUser(user);
+    loadsDenormalizer.afterInsertUser(result);
     return result;
   }
   remove(selector, callback) {
@@ -36,7 +36,6 @@ export const Users = new UsersCollection('users'); // Mongo server Collection
 Schema = {};
 
 Schema.users = new SimpleSchema({
-  userId: { type: String },
   hasStore: { type: Boolean },
   hasGen: { type: Boolean },
 });
@@ -44,7 +43,6 @@ Schema.users = new SimpleSchema({
 Users.attachSchema(Schema.users);
 
 Users.publicFields = {
-  userId: 1,
   hasGen: 1,
   hasStore: 1,
 };
