@@ -6,7 +6,7 @@ import { Meteor } from 'meteor/meteor';
 // inside a React component), we need to wrap our component in a container using
 // the createContainer Higher Order Component
 import { createContainer } from 'meteor/react-meteor-data';
-import { Users } from '../api/users.js';
+import { Users } from '../api/users/users.js';
 
 import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';

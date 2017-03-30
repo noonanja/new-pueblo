@@ -1,0 +1,64 @@
+import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo';
+
+import { Loads } from '../loads/loads.js';
+
+import {simulate} from './userMethods.js'
+import { drawConsumption } from '../loads/hourlyStats.js';
+
+const loadsDenormalizer = {
+  afterInsertUser(user) {
+    Loads.insert({
+      userId: user.userId,
+      e_n: drawConsumption()
+    });
+  }
+};
+
+class UsersCollection extends Mongo.Collection {
+  insert(user, callback) {
+    // Call the original `insert` method, which will validate
+    // against the schema
+    const result = super.insert(user, callback);
+    loadsDenormalizer.afterInsertUser(user);
+    return result;
+  }
+  remove(selector, callback) {
+    Loads.remove({userId: selector});
+    return super.remove(selector, callback);
+  }
+}
+
+export const Users = new UsersCollection('users'); // Mongo server Collection
+// export const Users = new UsersCollectionCollection(null); // local Collection
+
+
+Schema = {};
+
+Schema.users = new SimpleSchema({
+  userId: { type: String },
+  hasStore: { type: Boolean },
+  hasGen: { type: Boolean },
+});
+
+Users.attachSchema(Schema.users);
+
+Users.publicFields = {
+  userId: 1,
+  hasGen: 1,
+  hasStore: 1,
+};
+
+// Deny all client-side updates since we will be using methods to manage this collection
+Users.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; },
+});
+
+if (Meteor.isServer) {
+  // This code only runs on the server
+  Meteor.publish('users', function usersPublication() {
+    return Users.find({fields: Users.publicFields});
+  });
+}

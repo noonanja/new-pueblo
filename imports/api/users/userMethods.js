@@ -1,8 +1,21 @@
 import { Users } from './users.js';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
-import { drawConsumption } from './hourlyStats.js';
-
+export const insertUser = new ValidatedMethod({
+  name: 'users.insert',
+  validate: new SimpleSchema({
+      userId: {type: Number},
+      hasStore: {type: Boolean},
+      hasGen: {type: Boolean}
+  }).validator(),
+  run({userId, hasStore, hasGen}) {
+    return Users.insert({
+      userId: userId,
+      hasStore: hasStore,
+      hasGen: hasGen
+    });
+  }
+});
 
 export const simulate = new ValidatedMethod({
   name: 'users.simulate',
@@ -17,7 +30,6 @@ export const simulate = new ValidatedMethod({
     maxHourlyProduction: {type: Number},
     maxDailyProduction: {type: Number},
   }).validator(),
-
   run({userTypes, requirements, cEfficiency, dEfficiency, capacity, maxChargeRate,
        leakRate, maxHourlyProduction, maxDailyProduction}) {
 
@@ -30,29 +42,15 @@ export const simulate = new ValidatedMethod({
 
     // insert storer-generators
     for(i = 1; i <= userTypes[0]; i++) {
-      Users.insert({
-        hasStore: true,
-        hasGen: true,
-        e_n: drawConsumption(),
-      });
+      Meteor.call("users.insert", {userId:i, hasStore:true, hasGen:true});
     }
-
     // insert storers
     for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
-      Users.insert({
-        hasStore: true,
-        hasGen: false,
-        e_n: drawConsumption()
-      });
+      Meteor.call("users.insert", {userId:i, hasStore:true, hasGen:false});
     }
-
     // insert generators
     for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
-      Users.insert({
-        hasStore: false,
-        hasGen: true,
-        e_n: drawConsumption()
-      });
+      Meteor.call("users.insert", {userId:i, hasStore:false, hasGen:true});
     }
 
   },
