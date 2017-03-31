@@ -1,4 +1,5 @@
 import { Users } from './users.js';
+import { Loads } from '../loads/loads.js';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
 export const insertUser = new ValidatedMethod({
@@ -36,7 +37,8 @@ export const simulate = new ValidatedMethod({
     //     'Cannot edit todos in a private list that is not yours');
     // }
 
-    Users.remove({});   // PLACEHOLDER UNTIL NEWLY DEFINED USERS
+    Users.remove({});   // PLACEHOLDER UNTIL BULK REMOVAL
+    Loads.remove({});   // PLACEHOLDER UNTIL BULK REMOVAL
 
     // insert storer-generators
     for(i = 1; i <= userTypes[0]; i++) {
@@ -50,7 +52,24 @@ export const simulate = new ValidatedMethod({
     for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
       Meteor.call("users.insert", {hasStore:false, hasGen:true});
     }
-
   },
 
 });
+
+
+// export const getAggLoad = new ValidatedMethod({
+//   name: 'loads.getAggLoads',
+//   validate: new SimpleSchema({
+//     filter: {type: Object},
+//   }).validator(),
+//   run({filter}) {
+//     let group = {
+//       _id: null,
+//       hourlyTotal: {
+//         $sum:
+//       }
+//     }
+//
+//   },
+//
+// });

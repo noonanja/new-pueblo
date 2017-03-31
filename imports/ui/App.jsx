@@ -6,7 +6,7 @@ import { Meteor } from 'meteor/meteor';
 // inside a React component), we need to wrap our component in a container using
 // the createContainer Higher Order Component
 import { createContainer } from 'meteor/react-meteor-data';
-import { Users } from '../api/users/users.js';
+import { Loads } from '../api/loads/loads.js';
 
 import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';
@@ -31,6 +31,8 @@ const defaultRequirements = 12
     , defaultLeakRate = 5
     , defaultMaxHourlyProduction = 6
     , defaultMaxDailyProduction = 7;
+
+const hourLabels = _.range(1,24);
 
 const aggData = {
     labels: _.range(1,24),
@@ -100,7 +102,7 @@ class App extends Component {
 
   updateTipValues(values) {
     this.setState({
-      userTypes: userTypes,
+      userTypes: values,
     });
   }
 
@@ -121,7 +123,7 @@ class App extends Component {
         <p>Mean Daily User Energy Requirements</p>
         <input type="number" step="2" value={this.state.requirements} required
         min={defaultRequirements-4} max={defaultRequirements+4}
-        name= "requirements" onChange={this.handleChange} dir="rtl"/> kWh
+        name= "requirements" onChange={this.handleChange} /> kWh
       </label>
     )
   }
@@ -134,14 +136,14 @@ class App extends Component {
             <p>Charge Efficiency</p>
             <input type="number" step="2" value={this.state.cEfficiency} required
             min={defaultCEfficiency-4} max={defaultCEfficiency+4}
-            name= "cEfficiency" onChange={this.handleChange} dir="rtl"/> %
+            name= "cEfficiency" onChange={this.handleChange} /> %
           </label>
 
           <label className="one-half column energyStorage">
             <p>Discharging Efficiency</p>
             <input type="number" step="2" value={this.state.dEfficiency} required
             min={defaultDEfficiency-4} max={defaultDEfficiency+4}
-            name= "dEfficiency" onChange={this.handleChange} dir="rtl"/> %
+            name= "dEfficiency" onChange={this.handleChange} /> %
           </label>
         </div>
         <div className="row">
@@ -149,14 +151,14 @@ class App extends Component {
             <p>Capacity</p>
             <input type="number" step="2" value={this.state.capacity} required
             min={defaultCapacity-4} max={defaultCapacity+4}
-            name= "capacity" onChange={this.handleChange} dir="rtl"/> kWh
+            name= "capacity" onChange={this.handleChange} /> kWh
           </label>
 
           <label className="one-half column energyStorage">
             <p>Max Charge Rate</p>
             <input type="number" step="2" value={this.state.maxChargeRate} required
             min={defaultMaxChargeRate-4} max={defaultMaxChargeRate+4}
-            name= "maxChargeRate" onChange={this.handleChange} dir="rtl"/> kWh per hour
+            name= "maxChargeRate" onChange={this.handleChange} /> kWh per hour
           </label>
         </div>
         <div className="row">
@@ -164,7 +166,7 @@ class App extends Component {
             <p>Leakage Rate</p>
             <input type="number" step="2" value={this.state.leakRate} required
             min={defaultLeakRate-4} max={defaultLeakRate+4}
-            name= "leakRate" onChange={this.handleChange} dir="rtl"/> %
+            name= "leakRate" onChange={this.handleChange} /> %
           </label>
         </div>
       </div>
@@ -179,7 +181,7 @@ class App extends Component {
               <p>Max Hourly Production</p>
               <input type="number" step="2" value={this.state.maxHourlyProduction} required
               min={defaultMaxHourlyProduction-4} max={defaultMaxHourlyProduction+4}
-              name= "maxHourlyProduction" onChange={this.handleChange} dir="rtl"/> kWh
+              name= "maxHourlyProduction" onChange={this.handleChange} /> kWh
             </label>
           </div>
           <div className="row">
@@ -194,7 +196,15 @@ class App extends Component {
     )
   }
 
+
+
   renderChartAgg() {
+    // const data = Meteor.call('getAggData', (err, res) => {
+    //   if (err) {
+    //     alert(err);
+    //   }
+    // });
+    // console.log(data);
     return <ChartAgg data={aggData}/>
   }
 
@@ -204,13 +214,14 @@ class App extends Component {
 
   handleChange(event) {
     const target = event.target;
-    const value = target.value;
+    const value = parseInt(target.value);
     const name = target.name;
     this.setState({[name]: value});
   }
 
   handleSubmit(event) {
     event.preventDefault();
+    console.log(this.state);
     Meteor.call('users.simulate', this.state, (err, res) => {
       if (err) {
         alert(err);
@@ -275,12 +286,12 @@ class App extends Component {
 }
 
 App.propTypes = {
-  users: PropTypes.array.isRequired,
+  loads: PropTypes.array.isRequired,
 };
 
 export default createContainer(() => {
-  Meteor.subscribe('users');
+  Meteor.subscribe('loads');
   return {
-    users: Users.find({}).fetch(),
+    loads: Loads.find({}).fetch(),
   };
 }, App);

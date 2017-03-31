@@ -10,7 +10,7 @@ const loadsDenormalizer = {
   afterInsertUser(userId) {
     Loads.insert({
       userId: userId,
-      e_n: drawConsumption()
+      e: drawConsumption()
     });
   }
 };
@@ -23,6 +23,7 @@ class UsersCollection extends Mongo.Collection {
     loadsDenormalizer.afterInsertUser(result);
     return result;
   }
+  // THIS DOES NOT WORK FOR BULK REMOVAL YET
   remove(selector, callback) {
     Loads.remove({userId: selector});
     return super.remove(selector, callback);
@@ -31,7 +32,6 @@ class UsersCollection extends Mongo.Collection {
 
 export const Users = new UsersCollection('users'); // Mongo server Collection
 // export const Users = new UsersCollectionCollection(null); // local Collection
-
 
 Schema = {};
 
