@@ -17,17 +17,16 @@ const loadsDenormalizer = {
 
 class UsersCollection extends Mongo.Collection {
   insert(user, callback) {
-    // Call the original `insert` method, which will validate
-    // against the schema
+    // Call the original `insert` method, which will validate against the schema
     const result = super.insert(user, callback);
     loadsDenormalizer.afterInsertUser(result);
     return result;
   }
   // THIS DOES NOT WORK FOR BULK REMOVAL YET
-  remove(selector, callback) {
-    Loads.remove({userId: selector});
-    return super.remove(selector, callback);
-  }
+  // remove(selector, callback) {
+  //   Loads.remove({userId: selector});
+  //   return super.remove(selector, callback);
+  // }
 }
 
 export const Users = new UsersCollection('users'); // Mongo server Collection

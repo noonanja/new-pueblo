@@ -6,7 +6,7 @@ import { Meteor } from 'meteor/meteor';
 // inside a React component), we need to wrap our component in a container using
 // the createContainer Higher Order Component
 import { createContainer } from 'meteor/react-meteor-data';
-import { Loads } from '../api/loads/loads.js';
+import { AggLoads } from '../api/loads/aggLoads.js';
 
 import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';
@@ -22,7 +22,7 @@ import 'rc-slider/assets/index.css';
 // const defaultUserTypes= [40, 80, 120];
 // const defaultStep = 5
 const activeMax = 8;
-const defaultUserTypes= [2, 4, 8];
+const defaultUserTypes= [2, 4, 6];
 const defaultStep = 2
 const marks = {0: '0'};
 marks[activeMax]= `${activeMax}`;
@@ -187,13 +187,21 @@ class App extends Component {
   }
 
   aggData() {
-    const data = Meteor.call('loads.getAggLoads', {}, (err, res) => {
-      if (err) {
-        alert(err);
-      }
-    });
-    console.log(data);
-    return data;
+    data = this.props.passiveLoad;
+    // const data = Meteor.call('loads.getAggLoads', {}, (err, res) => {
+    //   if (err) {
+    //     alert(err);
+    //     return [];
+    //   }
+    // });
+    if (data) {
+      console.log(data);
+      return data;
+    }
+    else {
+      console.log(data);
+      return []
+    }
   }
 
   renderChartAgg() {
@@ -300,12 +308,13 @@ class App extends Component {
 
 App.propTypes = {
   loading: PropTypes.bool.isRequired,
-  loads: PropTypes.array.isRequired,
+  activeLoad: PropTypes.array.isRequired,
 };
 
 export default createContainer(({ params }) => {
-  const subscription = Meteor.subscribe('loads');
-  const loading = !subscription.ready();
-  const loads = Loads.find({}).fetch();
-  return {loading, loads};
+  const subscription = Meteor.subscribe('aggLoads');
+  return {
+    loading: !subscription.ready(),
+    activeLoad: AggLoads.find({active: true}).fetch();
+  };
 }, App);

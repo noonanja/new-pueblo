@@ -1,42 +1,47 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 
-export const Loads = new Mongo.Collection('loads');
+import { Users } from '../users/users.js';
+import { AggLoads } from './aggLoads.js'
+import { Schema } from '../schema.js';
 
+class LoadsCollection extends Mongo.Collection {
+  insert(load, callback) {
+    const result = super.insert(load, callback);
+    aggLoadDenormalizer.afterInsertLoad(result);
+    return result;
+  }
+  // remove(selector, callback) {
+  //   Loads.remove({userId: selector});
+  //   return super.remove(selector, callback);
+  // }
+}
 
-Schema = {}
-Schema.consumption = new SimpleSchema({
-  "h1": {type: Number, decimal: true},
-  "h2": {type: Number, decimal: true},
-  "h3": {type: Number, decimal: true},
-  "h4": {type: Number, decimal: true},
-  "h5": {type: Number, decimal: true},
-  "h6": {type: Number, decimal: true},
-  "h7": {type: Number, decimal: true},
-  "h8": {type: Number, decimal: true},
-  "h9": {type: Number, decimal: true},
-  "h10": {type: Number, decimal: true},
-  "h11": {type: Number, decimal: true},
-  "h12": {type: Number, decimal: true},
-  "h13": {type: Number, decimal: true},
-  "h14": {type: Number, decimal: true},
-  "h15": {type: Number, decimal: true},
-  "h16": {type: Number, decimal: true},
-  "h17": {type: Number, decimal: true},
-  "h18": {type: Number, decimal: true},
-  "h19": {type: Number, decimal: true},
-  "h20": {type: Number, decimal: true},
-  "h21": {type: Number, decimal: true},
-  "h22": {type: Number, decimal: true},
-  "h23": {type: Number, decimal: true},
-  "h24": {type: Number, decimal: true},
-});
+export const Loads = new LoadsCollection('loads');
 
-Schema.loads = new SimpleSchema({
-  userId: { type: String},
-  e: {type: Schema.consumption, defaultValue: {}},
-  // ts: {type: Date},
-});
+const aggLoadDenormalizer = {
+  afterInsertLoad(loadId) {
+    load = Loads.findOne({_id: loadId});
+    user = Users.findOne({_id: load.userId});
+    AggLoads.update(
+      {active: (user.hasGen || user.hasStore)},
+      {$inc: {"h1": load.e.h1, "h2": load.e.h2,
+              "h3": load.e.h3, "h4": load.e.h4,
+              "h5": load.e.h5, "h6": load.e.h6,
+              "h7": load.e.h7, "h8": load.e.h8,
+              "h9": load.e.h9, "h10": load.e.h10,
+              "h11": load.e.h11, "h12": load.e.h12,
+              "h13": load.e.h13, "h14": load.e.h14,
+              "h15": load.e.h15, "h16": load.e.h16,
+              "h17": load.e.h17, "h18": load.e.h18,
+              "h19": load.e.h19, "h20": load.e.h20,
+              "h21": load.e.h21, "h22": load.e.h22,
+              "h23": load.e.h23, "h24": load.e.h24}},
+      {upsert: true},
+    );
+  }
+};
+
 Loads.attachSchema(Schema.loads);
 
 Loads.publicFields = {
@@ -46,16 +51,8 @@ Loads.publicFields = {
   // g_n: 1,
 };
 
-// Deny all client-side updates since we will be using methods to manage this collection
 Loads.deny({
   insert() { return true; },
   update() { return true; },
   remove() { return true; },
 });
-
-if (Meteor.isServer) {
-  // This code only runs on the server
-  Meteor.publish('loads', function loadsPublication() {
-    return Loads.find({fields: Loads.publicFields});
-  });
-}
