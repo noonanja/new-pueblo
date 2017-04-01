@@ -186,31 +186,15 @@ class App extends Component {
     )
   }
 
-  aggData() {
-    data = this.props.passiveLoad;
-    // const data = Meteor.call('loads.getAggLoads', {}, (err, res) => {
-    //   if (err) {
-    //     alert(err);
-    //     return [];
-    //   }
-    // });
-    if (data) {
-      console.log(data);
-      return data;
-    }
-    else {
-      console.log(data);
-      return []
-    }
-  }
-
   renderChartAgg() {
-    const data = {
+    let aggData = this.props.activeLoad;
+    console.log(aggData);
+    let data = {
       labels: hourLabels,
       datasets: [{
         label: "Aggregate Load",
         borderWidth: 1,
-        data: this.aggData(),
+        data: aggData,
       }]
     }
     return <ChartAgg data={data}/>
@@ -307,14 +291,14 @@ class App extends Component {
 }
 
 App.propTypes = {
-  loading: PropTypes.bool.isRequired,
   activeLoad: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired
 };
 
 export default createContainer(({ params }) => {
   const subscription = Meteor.subscribe('aggLoads');
   return {
-    loading: !subscription.ready(),
-    activeLoad: AggLoads.find({active: true}).fetch();
+    activeLoad: AggLoads.find().fetch(),
+    loading: !subscription.ready()
   };
 }, App);
