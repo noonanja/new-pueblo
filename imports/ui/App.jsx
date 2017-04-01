@@ -18,8 +18,12 @@ const Handle = Slider.Handle;
 const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
-const activeMax = 180;
-const defaultUserTypes= [40, 80, 120];
+// const activeMax = 180;
+// const defaultUserTypes= [40, 80, 120];
+// const defaultStep = 5
+const activeMax = 8;
+const defaultUserTypes= [2, 4, 8];
+const defaultStep = 2
 const marks = {0: '0'};
 marks[activeMax]= `${activeMax}`;
 
@@ -32,24 +36,10 @@ const defaultRequirements = 12
     , defaultMaxHourlyProduction = 6
     , defaultMaxDailyProduction = 7;
 
-const hourLabels = _.range(1,24);
-
-const aggData = {
-    labels: _.range(1,24),
-    datasets: [
-        {
-            label: "Aggregate Load",
-            borderWidth: 1,
-            data: [400, 380, 370, 370, 325, 390, 400, 405, 404, 420, 421, 420, 480,
-            520, 522, 603, 690, 725, 780, 781, 680, 680, 603, 425],
-            // xAxisID: "hour",
-            // yAxisID: "Load [kWh]",
-        }
-    ]
-};
+const hourLabels = _.range(1,25);
 
 const priceData = {
-    labels: _.range(1,24),
+    labels: hourLabels,
     datasets: [
         {
             label: "Price per kWh",
@@ -112,7 +102,7 @@ class App extends Component {
         <Range
           handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
           ref= "range" min={0} max={activeMax} pushable={true}
-          defaultValue={defaultUserTypes} step={5} included={false} marks ={marks} />
+          defaultValue={defaultUserTypes} step={defaultStep} included={false} marks ={marks} />
         </div>
     )
   }
@@ -196,16 +186,26 @@ class App extends Component {
     )
   }
 
-
+  aggData() {
+    const data = Meteor.call('loads.getAggLoads', {}, (err, res) => {
+      if (err) {
+        alert(err);
+      }
+    });
+    console.log(data);
+    return data;
+  }
 
   renderChartAgg() {
-    // const data = Meteor.call('getAggData', (err, res) => {
-    //   if (err) {
-    //     alert(err);
-    //   }
-    // });
-    // console.log(data);
-    return <ChartAgg data={aggData}/>
+    const data = {
+      labels: hourLabels,
+      datasets: [{
+        label: "Aggregate Load",
+        borderWidth: 1,
+        data: this.aggData(),
+      }]
+    }
+    return <ChartAgg data={data}/>
   }
 
   renderChartPrice() {
@@ -221,12 +221,27 @@ class App extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log(this.state);
     Meteor.call('users.simulate', this.state, (err, res) => {
       if (err) {
         alert(err);
       }
     });
+  }
+
+  renderSubmit() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <input type="submit" id="run" className="u-pull-right" value="run" />
+      </form>
+    )
+  }
+
+  renderLoading() {
+    return (<div>loading</div>)
+  }
+
+  renderSimulate() {
+    return this.props.loading ? this.renderLoading() : this.renderSubmit()
   }
 
   render() {
@@ -242,9 +257,7 @@ class App extends Component {
 
         <div className="container">
             <div className="row">
-              <form onSubmit={this.handleSubmit}>
-                <input type="submit" id="run" className="u-pull-right" value="run" />
-              </form>
+              {this.renderSimulate()}
               <h5> Demand-Side Users </h5>
                 {this.renderRange()}
                 {this.renderRequirements()}
@@ -286,12 +299,13 @@ class App extends Component {
 }
 
 App.propTypes = {
+  loading: PropTypes.bool.isRequired,
   loads: PropTypes.array.isRequired,
 };
 
-export default createContainer(() => {
-  Meteor.subscribe('loads');
-  return {
-    loads: Loads.find({}).fetch(),
-  };
+export default createContainer(({ params }) => {
+  const subscription = Meteor.subscribe('loads');
+  const loading = !subscription.ready();
+  const loads = Loads.find({}).fetch();
+  return {loading, loads};
 }, App);

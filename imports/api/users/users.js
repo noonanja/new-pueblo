@@ -3,7 +3,7 @@ import { Mongo } from 'meteor/mongo';
 
 import { Loads } from '../loads/loads.js';
 
-import {simulate} from './userMethods.js'
+import {simulate} from '../methods.js'
 import { drawConsumption } from '../loads/hourlyStats.js';
 
 const loadsDenormalizer = {
