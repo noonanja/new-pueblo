@@ -34,3 +34,8 @@ Schema.loads = new SimpleSchema({
   e: {type: Schema.consumption},
   // ts: {type: Date},
 });
+
+Schema.users = new SimpleSchema({
+  hasStore: { type: Boolean },
+  hasGen: { type: Boolean },
+});

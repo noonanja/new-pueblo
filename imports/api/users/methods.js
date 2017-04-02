@@ -1,6 +1,6 @@
-import { Users } from './users/users.js';
-import { Loads } from './loads/loads.js';
-import { AggLoads } from './loads/aggLoads.js';
+import { Users } from './users.js';
+import { Loads } from '../loads/loads.js';
+import { AggLoads } from '../loads/aggLoads.js';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
 export const insertUser = new ValidatedMethod({
@@ -38,9 +38,9 @@ export const simulate = new ValidatedMethod({
     //     'Cannot edit todos in a private list that is not yours');
     // }
 
-    Users.remove({});   // PLACEHOLDER UNTIL BULK REMOVAL
-    Loads.remove({});   // PLACEHOLDER UNTIL BULK REMOVAL
-    AggLoads.remove({});   // PLACEHOLDER UNTIL BULK REMOVAL
+    Users.remove({});       // PLACEHOLDER UNTIL BULK REMOVAL
+    Loads.remove({});       // PLACEHOLDER UNTIL BULK REMOVAL
+    AggLoads.remove({});    // PLACEHOLDER UNTIL BULK REMOVAL
 
     // insert storer-generators
     for(i = 1; i <= userTypes[0]; i++) {
