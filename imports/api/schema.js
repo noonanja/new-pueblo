@@ -27,7 +27,10 @@ Schema.consumption = new SimpleSchema({
   h24: {type: Number, decimal: true},
 });
 
-AggSchema = new SimpleSchema([Schema.consumption, {active: {type: Boolean} }]);
+AggSchema = new SimpleSchema({
+  active: {type: Boolean},
+  l: {type: Schema.consumption},
+});
 
 Schema.loads = new SimpleSchema({
   userId: { type: String},

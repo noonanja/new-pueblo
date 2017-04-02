@@ -188,13 +188,7 @@ class App extends Component {
   }
 
   renderChartAgg() {
-    if (!this.props.activeLoadExists) {
-      console.log("don't exist");
-    }
     let aggData = this.props.activeLoad;
-    if (!aggData) {
-      aggData = []
-    }
     console.log(aggData);
     let data = {
       labels: hourLabels,
@@ -298,19 +292,17 @@ class App extends Component {
 }
 
 App.propTypes = {
-  activeLoad: React.PropTypes.object,
+  activeLoad: React.PropTypes.array,
   loading: React.PropTypes.bool,
-  activeLoadExists: React.PropTypes.bool,
 };
 
 export default createContainer(({ params }) => {
   const aggLoadsHandle = Meteor.subscribe('aggLoads');
   const loading = !aggLoadsHandle.ready();
-  const activeLoad = AggLoads.findOne();
+  const activeLoad = AggLoads.findOne({active: true});
   const activeLoadExists = !loading && !!activeLoad;
   return {
     loading,
-    activeLoad,
-    activeLoadExists,
+    activeLoad: activeLoadExists ? _.values(activeLoad.l) : [],
   };
 }, App);
