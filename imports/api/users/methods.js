@@ -1,6 +1,6 @@
 import { Users } from './users.js';
 import { Loads } from '../loads/loads.js';
-import { AggLoads } from '../loads/aggLoads.js';
+import { AggLoads } from '../aggLoads/aggLoads.js';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
 export const insertUser = new ValidatedMethod({
@@ -44,15 +44,27 @@ export const simulate = new ValidatedMethod({
 
     // insert storer-generators
     for(i = 1; i <= userTypes[0]; i++) {
-      Meteor.call("users.insert", {hasStore:true, hasGen:true});
+      Meteor.call("users.insert", {hasStore:true, hasGen:true}, (error, result) => {
+        if (error) {
+          console.log(error);
+        }
+      });
     }
     // insert storers
     for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
-      Meteor.call("users.insert", {hasStore:true, hasGen:false});
+      Meteor.call("users.insert", {hasStore:true, hasGen:false}, (error, result) => {
+        if (error) {
+          console.log(error);
+        }
+      });
     }
     // insert generators
     for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
-      Meteor.call("users.insert", {hasStore:false, hasGen:true});
+      Meteor.call("users.insert", {hasStore:false, hasGen:true}, (error, result) => {
+        if (error) {
+          console.log(error);
+        }
+      });
     }
   },
 

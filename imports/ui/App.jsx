@@ -6,7 +6,8 @@ import { Meteor } from 'meteor/meteor';
 // inside a React component), we need to wrap our component in a container using
 // the createContainer Higher Order Component
 import { createContainer } from 'meteor/react-meteor-data';
-import { AggLoads } from '../api/loads/aggLoads.js';
+import { Users }    from '../api/users/users.js';
+import { AggLoads } from '../api/aggLoads/aggLoads.js';
 
 import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';
@@ -187,7 +188,13 @@ class App extends Component {
   }
 
   renderChartAgg() {
+    if (!this.props.activeLoadExists) {
+      console.log("don't exist");
+    }
     let aggData = this.props.activeLoad;
+    if (!aggData) {
+      aggData = []
+    }
     console.log(aggData);
     let data = {
       labels: hourLabels,
@@ -291,14 +298,19 @@ class App extends Component {
 }
 
 App.propTypes = {
-  activeLoad: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired
+  activeLoad: React.PropTypes.object,
+  loading: React.PropTypes.bool,
+  activeLoadExists: React.PropTypes.bool,
 };
 
 export default createContainer(({ params }) => {
-  const subscription = Meteor.subscribe('aggLoads');
+  const aggLoadsHandle = Meteor.subscribe('aggLoads');
+  const loading = !aggLoadsHandle.ready();
+  const activeLoad = AggLoads.findOne();
+  const activeLoadExists = !loading && !!activeLoad;
   return {
-    activeLoad: AggLoads.find().fetch(),
-    loading: !subscription.ready()
+    loading,
+    activeLoad,
+    activeLoadExists,
   };
 }, App);

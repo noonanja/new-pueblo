@@ -1,6 +1,4 @@
-import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-
 import { Schema } from '../schema.js';
 
 export const AggLoads = new Mongo.Collection('aggLoads');
