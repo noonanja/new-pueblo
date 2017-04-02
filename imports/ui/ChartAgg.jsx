@@ -18,8 +18,8 @@ const aggOptions = { scales: {
 
 export default class ChartAgg extends Component {
   chartAggData() {
-    let labels = _.range(1, this.props.activeAggLoadVals.length+1);
-    let data = this.props.activeAggLoadVals;
+    let labels = _.range(1, this.props.activeLoad.length+1);
+    let data = this.props.activeLoad;
     return {
       labels: labels,
       datasets: [{
@@ -31,7 +31,7 @@ export default class ChartAgg extends Component {
   }
 
   render() {
-    console.log(this.props.activeAggLoadVals);
+    console.log(this.props.activeLoad);
     return (
       <BarChart data={this.chartAggData()} options={aggOptions} />
     )
@@ -39,5 +39,5 @@ export default class ChartAgg extends Component {
 }
 
 ChartAgg.propTypes = {
-  activeAggLoadVals: React.PropTypes.array,
+  activeLoad: React.PropTypes.array,
 };

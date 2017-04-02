@@ -257,7 +257,7 @@ class App extends Component {
             <div className="row chart-section">
               <div className="one-half column">
                 <h6 className="graph-header"> Aggregate Load </h6>
-                <ChartAgg activeAggLoadVals={this.props.activeAggLoadVals}/>
+                <ChartAgg activeLoad={this.props.activeLoad}/>
               </div>
               <div className="one-half column">
                 <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
@@ -279,21 +279,17 @@ class App extends Component {
 }
 
 App.propTypes = {
-  activeAggLoad: React.PropTypes.object,
-  activeAggLoadVals: React.PropTypes.array,
+  activeAggLoad: React.PropTypes.array,
   loading: React.PropTypes.bool,
-  activeAggLoadExists: React.PropTypes.bool,
 };
 
 export default createContainer(({ params }) => {
   const aggLoadsHandle = Meteor.subscribe('aggLoads');
   const loading = !aggLoadsHandle.ready();
-  const activeAggLoad = AggLoads.findOne({active: true});
-  const activeAggLoadExists = !loading && !!activeAggLoad;
+  const activeLoad = AggLoads.findOne({active: true});
+  const activeLoadExists = !loading && !!activeLoad;
   return {
     loading,
-    activeAggLoadExists,
-    activeAggLoad,
-    activeAggLoadVals: activeAggLoadExists ? _.values(activeAggLoad.l) : [],
+    activeLoad: activeLoadExists ? _.values(activeLoad.l) : [],
   };
 }, App);
