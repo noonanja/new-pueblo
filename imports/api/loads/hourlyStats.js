@@ -32,13 +32,8 @@ const consumptionDistribution = hourlyMeanVariance.map(function({mean, vrnc}) {
 })
 
 export function drawConsumption() {
-  a= consumptionDistribution.reduce(function(result, distr, i) {
+  return consumptionDistribution.reduce(function(result, distr, i) {
     result[`h${i+1}`] = distr.ppf(Math.random());
     return result;
   }, {});
-  // a =  consumptionDistribution.map(function(distribution) {
-  //   return distribution.ppf(Math.random());
-  // });
-  // console.log(a);
-  return a;
 }

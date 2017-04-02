@@ -37,21 +37,21 @@ const defaultRequirements = 12
     , defaultMaxHourlyProduction = 6
     , defaultMaxDailyProduction = 7;
 
-const hourLabels = _.range(1,25);
-
-const priceData = {
-    labels: hourLabels,
-    datasets: [
-        {
-            label: "Price per kWh",
-            borderWidth: 1,
-            data: [400, 380, 370, 370, 325, 390, 400, 405, 404, 420, 421, 420, 480,
-            520, 522, 603, 690, 725, 780, 781, 680, 680, 603, 425],
-            // xAxisID: "hour",
-            // yAxisID: "$/ kWh",
-        }
-    ]
-};
+// const hourLabels = _.range(1,25);
+//
+// const priceData = {
+//     labels: hourLabels,
+//     datasets: [
+//         {
+//             label: "Price per kWh",
+//             borderWidth: 1,
+//             data: [400, 380, 370, 370, 325, 390, 400, 405, 404, 420, 421, 420, 480,
+//             520, 522, 603, 690, 725, 780, 781, 680, 680, 603, 425],
+//             // xAxisID: "hour",
+//             // yAxisID: "$/ kWh",
+//         }
+//     ]
+// };
 
 // App component - represents the whole app
 class App extends Component {
@@ -187,22 +187,9 @@ class App extends Component {
     )
   }
 
-  renderChartAgg() {
-    let aggData = this.props.activeLoad;
-    console.log(aggData);
-    let data = {
-      labels: hourLabels,
-      datasets: [{
-        label: "Aggregate Load",
-        borderWidth: 1,
-        data: aggData,
-      }]
-    }
-    return <ChartAgg data={data}/>
-  }
-
   renderChartPrice() {
-    return <ChartPrice data={priceData}/>
+    return null
+    // return <ChartPrice data={priceData}/>
   }
 
   handleChange(event) {
@@ -270,7 +257,7 @@ class App extends Component {
             <div className="row chart-section">
               <div className="one-half column">
                 <h6 className="graph-header"> Aggregate Load </h6>
-                {this.renderChartAgg()}
+                <ChartAgg activeAggLoadVals={this.props.activeAggLoadVals}/>
               </div>
               <div className="one-half column">
                 <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
@@ -292,17 +279,21 @@ class App extends Component {
 }
 
 App.propTypes = {
-  activeLoad: React.PropTypes.array,
+  activeAggLoad: React.PropTypes.object,
+  activeAggLoadVals: React.PropTypes.array,
   loading: React.PropTypes.bool,
+  activeAggLoadExists: React.PropTypes.bool,
 };
 
 export default createContainer(({ params }) => {
   const aggLoadsHandle = Meteor.subscribe('aggLoads');
   const loading = !aggLoadsHandle.ready();
-  const activeLoad = AggLoads.findOne({active: true});
-  const activeLoadExists = !loading && !!activeLoad;
+  const activeAggLoad = AggLoads.findOne({active: true});
+  const activeAggLoadExists = !loading && !!activeAggLoad;
   return {
     loading,
-    activeLoad: activeLoadExists ? _.values(activeLoad.l) : [],
+    activeAggLoadExists,
+    activeAggLoad,
+    activeAggLoadVals: activeAggLoadExists ? _.values(activeAggLoad.l) : [],
   };
 }, App);
