@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-const BarChart = require("react-chartjs").Bar;
+const BarChart = require("react-chartjs-2").Bar;
 
 const priceOptions = { scales: {
                           xAxes: [{stacked: true}],

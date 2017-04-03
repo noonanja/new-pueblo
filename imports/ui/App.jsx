@@ -9,6 +9,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import { Users }    from '../api/users/users.js';
 import { AggLoads } from '../api/aggLoads/aggLoads.js';
 
+import ChartUsers from './ChartUsers.jsx';
 import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';
 
@@ -19,14 +20,9 @@ const Handle = Slider.Handle;
 const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
-// const activeMax = 180;
-// const defaultUserTypes= [40, 80, 120];
-// const defaultStep = 5
-const activeMax = 8;
-const defaultUserTypes= [2, 4, 6];
-const defaultStep = 2
-const marks = {0: '0'};
-marks[activeMax]= `${activeMax}`;
+const defaultMaxActive = 180;
+const defaultUserTypes= [40, 80, 120];
+const defaultStep = 5;
 
 const defaultRequirements = 12
     , defaultCEfficiency = 1
@@ -37,22 +33,6 @@ const defaultRequirements = 12
     , defaultMaxHourlyProduction = 6
     , defaultMaxDailyProduction = 7;
 
-// const hourLabels = _.range(1,25);
-//
-// const priceData = {
-//     labels: hourLabels,
-//     datasets: [
-//         {
-//             label: "Price per kWh",
-//             borderWidth: 1,
-//             data: [400, 380, 370, 370, 325, 390, 400, 405, 404, 420, 421, 420, 480,
-//             520, 522, 603, 690, 725, 780, 781, 680, 680, 603, 425],
-//             // xAxisID: "hour",
-//             // yAxisID: "$/ kWh",
-//         }
-//     ]
-// };
-
 // App component - represents the whole app
 class App extends Component {
   constructor(props) {
@@ -61,6 +41,7 @@ class App extends Component {
     this.state = {
       userTypes: defaultUserTypes,
       requirements: defaultRequirements,
+      maxActive: defaultMaxActive,
       cEfficiency: defaultCEfficiency,
       dEfficiency: defaultDEfficiency,
       capacity: defaultCapacity,
@@ -97,25 +78,48 @@ class App extends Component {
     });
   }
 
+  renderDemandSide() {
+    return (
+      <div>
+        <div className="row">
+          <label className="mean-daily">
+            <p>Mean Daily User Consumption</p>
+            <input type="number" step="2" value={this.state.requirements} required
+            min={defaultRequirements-4} max={defaultRequirements+4}
+            name= "requirements" onChange={this.handleChange} /> kWh
+          </label>
+        </div>
+        <div className="row">
+          <label>
+            <p>Number Active Users</p>
+            <input type="number" step="10" value={this.state.maxActive} required
+            min={defaultMaxActive-60} max={defaultMaxActive+60}
+            name= "maxActive" onChange={this.handleChange} /> users
+          </label>
+        </div>
+      </div>
+    )
+  }
+
+  renderChartUsers() {
+    return <ChartUsers userTypes={this.state.userTypes} />
+  }
+
+  rangeMarks() {
+    const marks = {0: '0'};
+    marks[this.state.maxActive]= `${this.state.maxActive}`;
+    return marks
+  }
+
   renderRange() {
     return (
         <div className="range">
         <Range
           handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
-          ref= "range" min={0} max={activeMax} pushable={true}
-          defaultValue={defaultUserTypes} step={defaultStep} included={false} marks ={marks} />
+          ref= "range" min={0} max={this.state.maxActive} pushable={true}
+          defaultValue={defaultUserTypes} step={defaultStep} included={false}
+          marks ={this.rangeMarks()} />
         </div>
-    )
-  }
-
-  renderRequirements() {
-    return (
-      <label className="mean-daily">
-        <p>Mean Daily User Energy Requirements</p>
-        <input type="number" step="2" value={this.state.requirements} required
-        min={defaultRequirements-4} max={defaultRequirements+4}
-        name= "requirements" onChange={this.handleChange} /> kWh
-      </label>
     )
   }
 
@@ -180,7 +184,7 @@ class App extends Component {
               <p>Max Daily Production</p>
               <input type="number" step="2" value={this.state.maxDailyProduction} required
               min={defaultMaxDailyProduction-4} max={defaultMaxDailyProduction+4}
-              name= "maxDailyProduction" onChange={this.handleChange} dir="rtl"/> kWh
+              name= "maxDailyProduction" onChange={this.handleChange} /> kWh
             </label>
           </div>
       </div>
@@ -188,7 +192,6 @@ class App extends Component {
   }
 
   renderChartPrice() {
-    return null
     // return <ChartPrice data={priceData}/>
   }
 
@@ -237,10 +240,20 @@ class App extends Component {
 
         <div className="container">
             <div className="row">
-              {this.renderSimulate()}
-              <h5> Demand-Side Users </h5>
-                {this.renderRange()}
-                {this.renderRequirements()}
+              <div className="one-third column">
+                <h5> Demand-Side Users </h5>
+                {this.renderDemandSide()}
+              </div>
+              <div className="two-thirds column">
+                {this.renderChartUsers()}
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="two-thirds column">
+                <h6> Active Users </h6>
+                  {this.renderRange()}
+              </div>
             </div>
 
             <div className="row">
@@ -252,6 +265,10 @@ class App extends Component {
                 <h5> Production </h5>
                 {this.renderProduction()}
               </div>
+            </div>
+
+            <div className ="row">
+              {this.renderSimulate()}
             </div>
 
             <div className="row chart-section">
