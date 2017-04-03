@@ -8,21 +8,24 @@
 
 .range {
   margin-right: 15%;
-  padding-top: 20px;
   padding-bottom: 30px;
 }
 
-.rc-slider-rail {
-  // background-color: $slider-color !important;
+.rc-slider-handle-1 {
+  border: solid 2px $slider-handle-1-border-color;
+  background-color: $slider-handle-color;
 }
 
-.rc-slider-track {
-  background-color: $slider-color;
+.rc-slider-handle-2 {
+  border: solid 2px $slider-handle-2-border-color;
+  background-color: $slider-handle-color;
 }
 
-.rc-slider-handle.rc-slider-handle-1 {
-  // left: 0% !important;
+.rc-slider-handle-3 {
+  border: solid 2px $slider-handle-3-border-color;
+  background-color: $slider-handle-color;
 }
+
 
 .chart-section {
   margin-top: .8rem;

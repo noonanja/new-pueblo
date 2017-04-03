@@ -21,9 +21,11 @@ const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
 const userCount = 800;
-const defaultMaxActive = 180;
+const maxActive = 240;
 const defaultUserTypes= [40, 80, 120];
 const defaultStep = 5;
+const marks = {0: '0'};
+marks[maxActive]= `${maxActive}`;
 
 const defaultRequirements = 12
     , defaultCEfficiency = 1
@@ -42,7 +44,6 @@ class App extends Component {
     this.state = {
       userTypes: defaultUserTypes,
       requirements: defaultRequirements,
-      maxActive: defaultMaxActive,
       cEfficiency: defaultCEfficiency,
       dEfficiency: defaultDEfficiency,
       capacity: defaultCapacity,
@@ -79,24 +80,7 @@ class App extends Component {
     });
   }
 
-  renderDemandSide() {
-    // <div className="row">
-    //   <label>
-    //     <p>Mean Daily User Consumption</p>
-    //     <input type="number" step="2" value={this.state.requirements} required
-    //     min={defaultRequirements-4} max={defaultRequirements+4}
-    //     name= "requirements" onChange={this.handleChange} /> kWh
-    //   </label>
-    // </div>
-    return (
-        <div className="row ">
-          Active Users:
-          <input type="number" step="10" value={this.state.maxActive} required
-          min={defaultMaxActive-60} max={defaultMaxActive+60}
-          name= "maxActive" onChange={this.handleChange} /> users
-        </div>
-    )
-  }
+
 
   renderChartUsers() {
     return (
@@ -104,20 +88,14 @@ class App extends Component {
     )
   }
 
-  rangeMarks() {
-    const marks = {0: '0'};
-    marks[this.state.maxActive]= `${this.state.maxActive}`;
-    return marks
-  }
-
   renderRange() {
     return (
         <div className="range">
         <Range
           handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
-          ref= "range" min={0} max={this.state.maxActive} pushable={true}
+          ref= "range" min={0} max={maxActive} pushable={true}
           defaultValue={defaultUserTypes} step={defaultStep} included={false}
-          marks ={this.rangeMarks()} />
+          marks ={marks} />
         </div>
     )
   }
@@ -241,10 +219,10 @@ class App extends Component {
             <div className="row">
               <div className="one-half column">
                 <h5> Demand-Side Users </h5>
-                  {this.renderDemandSide()}
+                  <p>Active Users</p>
                   {this.renderRange()}
               </div>
-              <div className="one-half column activeUsers">
+              <div className="one-half column">
                 {this.renderChartUsers()}
               </div>
             </div>

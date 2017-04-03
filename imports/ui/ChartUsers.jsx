@@ -34,14 +34,14 @@ export default class ChartUsers extends Component {
                       ],
                 backgroundColor: [
                     "#FF6384",
-                    "#36A2EB",
                     "#FFCE56",
+                    "#36A2EB",
                     "#ddd9d3",
                 ],
                 hoverBackgroundColor: [
                     "#FF6384",
-                    "#36A2EB",
                     "#FFCE56",
+                    "#36A2EB",
                     "#ddd9d3",
                 ]
             }]
