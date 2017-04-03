@@ -20,6 +20,7 @@ const Handle = Slider.Handle;
 const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
+const userCount = 800;
 const defaultMaxActive = 180;
 const defaultUserTypes= [40, 80, 120];
 const defaultStep = 5;
@@ -79,30 +80,28 @@ class App extends Component {
   }
 
   renderDemandSide() {
+    // <div className="row">
+    //   <label>
+    //     <p>Mean Daily User Consumption</p>
+    //     <input type="number" step="2" value={this.state.requirements} required
+    //     min={defaultRequirements-4} max={defaultRequirements+4}
+    //     name= "requirements" onChange={this.handleChange} /> kWh
+    //   </label>
+    // </div>
     return (
-      <div>
-        <div className="row">
-          <label className="mean-daily">
-            <p>Mean Daily User Consumption</p>
-            <input type="number" step="2" value={this.state.requirements} required
-            min={defaultRequirements-4} max={defaultRequirements+4}
-            name= "requirements" onChange={this.handleChange} /> kWh
-          </label>
+        <div className="row ">
+          Active Users:
+          <input type="number" step="10" value={this.state.maxActive} required
+          min={defaultMaxActive-60} max={defaultMaxActive+60}
+          name= "maxActive" onChange={this.handleChange} /> users
         </div>
-        <div className="row">
-          <label>
-            <p>Number Active Users</p>
-            <input type="number" step="10" value={this.state.maxActive} required
-            min={defaultMaxActive-60} max={defaultMaxActive+60}
-            name= "maxActive" onChange={this.handleChange} /> users
-          </label>
-        </div>
-      </div>
     )
   }
 
   renderChartUsers() {
-    return <ChartUsers userTypes={this.state.userTypes} />
+    return (
+        <ChartUsers userTypes={this.state.userTypes} userCount={userCount} />
+    )
   }
 
   rangeMarks() {
@@ -240,19 +239,13 @@ class App extends Component {
 
         <div className="container">
             <div className="row">
-              <div className="one-third column">
+              <div className="one-half column">
                 <h5> Demand-Side Users </h5>
-                {this.renderDemandSide()}
-              </div>
-              <div className="two-thirds column">
-                {this.renderChartUsers()}
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="two-thirds column">
-                <h6> Active Users </h6>
+                  {this.renderDemandSide()}
                   {this.renderRange()}
+              </div>
+              <div className="one-half column activeUsers">
+                {this.renderChartUsers()}
               </div>
             </div>
 
