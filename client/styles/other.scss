@@ -1,39 +1,42 @@
 /* Demand-Side Users */
 @import 'variables';
 
-.activeUsers {
-  padding-top: 10px;
-}
-
-
 .range {
   margin-right: 15%;
   padding-bottom: 30px;
 }
 
 .rc-slider-handle-1 {
-  border: solid 2px $slider-handle-1-border-color;
+  border: solid 2px $slider-handle-1-border-color !important;
   background-color: $slider-handle-color;
 }
 
 .rc-slider-handle-2 {
-  border: solid 2px $slider-handle-2-border-color;
+  border: solid 2px $slider-handle-2-border-color !important;
   background-color: $slider-handle-color;
 }
 
 .rc-slider-handle-3 {
-  border: solid 2px $slider-handle-3-border-color;
+  border: solid 2px $slider-handle-3-border-color !important;
   background-color: $slider-handle-color;
+}
+
+.der-constraints {
+  padding-top: 1em;
 }
 
 
 .chart-section {
-  margin-top: .8rem;
+  margin-top: 1.5rem;
   padding-top: 1rem;
   padding-left: 1rem;
   padding-right: 1rem;
   text-align: center;
   background-color: $chart-background-color;
+}
+
+.simulate {
+  text-align: center;
 }
 
 

@@ -191,13 +191,15 @@ class App extends Component {
   renderSubmit() {
     return (
       <form onSubmit={this.handleSubmit}>
-        <input type="submit" id="run" className="u-pull-right" value="run" />
+        <input type="submit" id="run" value="run" />
       </form>
     )
   }
 
   renderLoading() {
-    return (<div>loading</div>)
+    return (
+        <img src="/loading.svg" />
+    )
   }
 
   renderSimulate() {
@@ -227,7 +229,7 @@ class App extends Component {
               </div>
             </div>
 
-            <div className="row">
+            <div className="row der-constraints">
               <div className="two-thirds column">
                 <h5> Storage </h5>
                 {this.renderStorage()}
@@ -238,7 +240,7 @@ class App extends Component {
               </div>
             </div>
 
-            <div className ="row">
+            <div className= "row simulate">
               {this.renderSimulate()}
             </div>
 
