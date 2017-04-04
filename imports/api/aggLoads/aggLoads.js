@@ -1,7 +1,7 @@
 import { Mongo } from 'meteor/mongo';
 import { Schema } from '../schema.js';
 
-export const AggLoads = new Mongo.Collection('aggLoads');
+export const AggLoads = new Mongo.Collection('aggLoads', { connection: null } );
 
 // AGGREGATION OF LOAD COLLECTION
 AggLoads.attachSchema(AggSchema);

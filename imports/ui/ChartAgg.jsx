@@ -18,19 +18,19 @@ const aggOptions = { scales: {
 
 export default class ChartAgg extends Component {
   chartAggData() {
-    const labels = _.range(1, this.props.activeLoad.length+1);
-    let data = this.props.activeLoad;
+    const values = this.props.passiveLoad.values;
+    const labels = _.range(1, values.length+1);
     let i = 0;
-    while(i < data.length) {
-      data[i] = parseFloat(data[i]).toFixed(2);
+    while(i < values.length) {
+      values[i] = parseFloat(values[i]).toFixed(2);
       i++;
     }
     return {
       labels: labels,
       datasets: [{
-        label: "Aggregate Load",
+        label: `Aggregate Passive Load (n=${this.props.passiveLoad.n})`,
         borderWidth: 1,
-        data: data,
+        data: values,
       }]
     }
   }
@@ -43,5 +43,6 @@ export default class ChartAgg extends Component {
 }
 
 ChartAgg.propTypes = {
-  activeLoad: React.PropTypes.array,
+  passiveLoad: React.PropTypes.object,
+  // activeLoad: React.PropTypes.object,
 };

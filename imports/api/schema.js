@@ -29,6 +29,7 @@ Schema.consumption = new SimpleSchema({
 
 AggSchema = new SimpleSchema({
   active: {type: Boolean},
+  n : {type: Number},
   l: {type: Schema.consumption},
 });
 

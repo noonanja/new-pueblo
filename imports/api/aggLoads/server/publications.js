@@ -9,5 +9,5 @@ AggLoads.publicFields = {
 };
 
 Meteor.publish('aggLoads', function loadsPublication() {
-  return AggLoads.find({},{fields: AggLoads.publicFields});
+  return AggLoads.find({}, {fields: AggLoads.publicFields});
 });

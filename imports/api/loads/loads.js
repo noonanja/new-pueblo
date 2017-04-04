@@ -13,6 +13,7 @@ const aggLoadDenormalizer = {
       {active: (user.hasGen || user.hasStore)},
       {
         $inc: {
+            n: 1,
             "l.h1":  load.e.h1,  "l.h2":  load.e.h2,  "l.h3":  load.e.h3,  "l.h4":  load.e.h4,
             "l.h5":  load.e.h5,  "l.h6":  load.e.h6,  "l.h7":  load.e.h7,  "l.h8":  load.e.h8,
             "l.h9":  load.e.h9,  "l.h10": load.e.h10, "l.h11": load.e.h11, "l.h12": load.e.h12,
@@ -22,6 +23,7 @@ const aggLoadDenormalizer = {
         },
         $setOnInsert: {
             active: (user.hasGen || user.hasStore),
+            n: 1,
             l: {
               h1:  load.e.h1,  h2:  load.e.h2,  h3:  load.e.h3,  h4:  load.e.h4,
               h5:  load.e.h5,  h6:  load.e.h6,  h7:  load.e.h7,  h8:  load.e.h8,
@@ -49,7 +51,8 @@ class LoadsCollection extends Mongo.Collection {
   // }
 }
 
-export const Loads = new LoadsCollection('loads');
+// export const Loads = new LoadsCollection('loads'); // syncs with server
+export const Loads = new LoadsCollection('loads', { connection: null } );
 
 Loads.attachSchema(Schema.loads);
 

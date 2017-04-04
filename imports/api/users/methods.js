@@ -1,19 +1,35 @@
+import { ValidatedMethod } from 'meteor/mdg:validated-method';
+
 import { Users } from './users.js';
 import { Loads } from '../loads/loads.js';
 import { AggLoads } from '../aggLoads/aggLoads.js';
-import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
-export const insertUser = new ValidatedMethod({
-  name: 'users.insert',
+import { Constraints } from '/lib/constraints.js';
+
+export const resize = new ValidatedMethod({
+  name: 'users.resize',
   validate: new SimpleSchema({
+      count: {type: Number},
       hasStore: {type: Boolean},
       hasGen: {type: Boolean}
   }).validator(),
-  run({hasStore, hasGen}) {
-    return Users.insert({
-      hasStore: hasStore,
-      hasGen: hasGen
-    });
+  run({count, hasStore, hasGen}) {
+    if (count > 0) {
+      for (i = 0; i < Math.abs(count); i++) {
+        Users.insert({
+          hasStore: hasStore,
+          hasGen: hasGen
+        });
+      }
+    }
+    else if (count < 0) {
+      for (i = 0; i < Math.abs(count); i++) {
+        Users.removeOne({
+          hasStore: hasStore,
+          hasGen: hasGen
+        });
+      }
+    }
   }
 });
 
@@ -38,34 +54,43 @@ export const simulate = new ValidatedMethod({
     //     'Cannot edit todos in a private list that is not yours');
     // }
 
-    Users.remove({});       // PLACEHOLDER UNTIL BULK REMOVAL
-    Loads.remove({});       // PLACEHOLDER UNTIL BULK REMOVAL
-    AggLoads.remove({});    // PLACEHOLDER UNTIL BULK REMOVAL
+    // insert passive
+    const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
+    const passiveChanged = Constraints.userCount - (passiveUsers + userTypes[2])
+    Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
+      if (error) {
+        console.log(error);
+      }
+    });
+
 
     // insert storer-generators
-    for(i = 1; i <= userTypes[0]; i++) {
-      Meteor.call("users.insert", {hasStore:true, hasGen:true}, (error, result) => {
-        if (error) {
-          console.log(error);
-        }
-      });
-    }
+    const sgCount = Users.find({hasStore: true, hasGen: true}).count();
+    const sgChanged = userTypes[0] - sgCount;
+    Meteor.call("users.resize", {count: sgChanged, hasStore:true, hasGen:true}, (error, result) => {
+      if (error) {
+        console.log(error);
+      }
+    });
+
     // insert storers
-    for(i = userTypes[0]+1; i <= userTypes[1]; i++) {
-      Meteor.call("users.insert", {hasStore:true, hasGen:false}, (error, result) => {
-        if (error) {
-          console.log(error);
-        }
-      });
-    }
+    const sCount = Users.find({hasStore: true, hasGen: false}).count();
+    const sChanged = (userTypes[1] - userTypes[0]) - sCount;
+    Meteor.call("users.resize", {count: sChanged, hasStore:true, hasGen:false}, (error, result) => {
+      if (error) {
+        console.log(error);
+      }
+    });
+
     // insert generators
-    for(i = userTypes[1]+1; i <= userTypes[2]; i++) {
-      Meteor.call("users.insert", {hasStore:false, hasGen:true}, (error, result) => {
-        if (error) {
-          console.log(error);
-        }
-      });
-    }
+    const gCount = Users.find({hasStore: false, hasGen: true}).count();
+    const gChanged = (userTypes[2] - userTypes[1]) - gCount;
+    Meteor.call("users.resize", {count: gChanged, hasStore:false, hasGen:true}, (error, result) => {
+      if (error) {
+        console.log(error);
+      }
+    });
+
   },
 
 });

@@ -240,7 +240,7 @@ class App extends Component {
             <div className="chart-section">
               <div className="row">
                 <h6 className="graph-header"> Aggregate Load </h6>
-                <ChartAgg activeLoad={this.props.activeLoad} />
+                <ChartAgg passiveLoad={this.props.passiveLoad} />
               </div>
               <div className="row">
                 <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
@@ -262,17 +262,21 @@ class App extends Component {
 }
 
 App.propTypes = {
-  activeAggLoad: React.PropTypes.array,
+  // activeLoad: React.PropTypes.object,
+  passiveLoad: React.PropTypes.object,
   loading: React.PropTypes.bool,
 };
 
 export default createContainer(({ params }) => {
   const aggLoadsHandle = Meteor.subscribe('aggLoads');
   const loading = !aggLoadsHandle.ready();
-  const activeLoad = AggLoads.findOne({active: true});
-  const activeLoadExists = !loading && !!activeLoad;
+  const passiveLoad = AggLoads.findOne({active: false});
+  // const activeLoad = AggLoads.findOne({active: true});
+  const passiveLoadExists = !loading && !!passiveLoad;
+  // const activeLoadExists = !loading && !!activeLoad;
   return {
     loading,
-    activeLoad: activeLoadExists ? _.values(activeLoad.l) : [],
+    passiveLoad: passiveLoadExists ? {n:passiveLoad.n, values:_.values(passiveLoad.l)} : {n:0,values: []},
+    // activeLoad: activeLoadExists ? {n:activeLoad.n, values:_.values(activeLoad.l)} : {n:0,values: []},
   };
 }, App);
