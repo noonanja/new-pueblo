@@ -18,8 +18,13 @@ const aggOptions = { scales: {
 
 export default class ChartAgg extends Component {
   chartAggData() {
-    let labels = _.range(1, this.props.activeLoad.length+1);
+    const labels = _.range(1, this.props.activeLoad.length+1);
     let data = this.props.activeLoad;
+    let i = 0;
+    while(i < data.length) {
+      data[i] = parseFloat(data[i]).toFixed(2);
+      i++;
+    }
     return {
       labels: labels,
       datasets: [{

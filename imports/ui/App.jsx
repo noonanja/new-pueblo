@@ -13,28 +13,23 @@ import ChartUsers from './ChartUsers.jsx';
 import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';
 
+// Contraints for DERs drawn from paper
+import {Constraints} from '/lib/constraints.js';
+const userCount = Constraints.userCount;
+const maxActive = Constraints.maxActive;
 
+// Range slider component
 import Range from 'rc-slider/lib/Range';
 import Slider from 'rc-slider';
 const Handle = Slider.Handle;
 const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
-const userCount = 800;
-const maxActive = 240;
 const defaultUserTypes= [40, 80, 120];
 const defaultStep = 5;
 const marks = {0: '0'};
 marks[maxActive]= `${maxActive}`;
 
-const defaultRequirements = 12
-    , defaultCEfficiency = 1
-    , defaultDEfficiency = 2
-    , defaultCapacity = 3
-    , defaultMaxChargeRate = 4
-    , defaultLeakRate = 5
-    , defaultMaxHourlyProduction = 6
-    , defaultMaxDailyProduction = 7;
 
 // App component - represents the whole app
 class App extends Component {
@@ -43,14 +38,14 @@ class App extends Component {
 
     this.state = {
       userTypes: defaultUserTypes,
-      requirements: defaultRequirements,
-      cEfficiency: defaultCEfficiency,
-      dEfficiency: defaultDEfficiency,
-      capacity: defaultCapacity,
-      maxChargeRate: defaultMaxChargeRate,
-      leakRate: defaultLeakRate,
-      maxHourlyProduction: defaultMaxHourlyProduction,
-      maxDailyProduction: defaultMaxDailyProduction,
+      requirements: Constraints.defaultRequirements,
+      cEfficiency: Constraints.defaultCEfficiency,
+      dEfficiency: Constraints.defaultDEfficiency,
+      capacity: Constraints.defaultCapacity,
+      maxChargeRate: Constraints.defaultMaxChargeRate,
+      leakRate: Constraints.defaultLeakRate,
+      maxHourlyProduction: Constraints.defaultMaxHourlyProduction,
+      maxDailyProduction: Constraints.defaultMaxDailyProduction,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -80,8 +75,6 @@ class App extends Component {
     });
   }
 
-
-
   renderChartUsers() {
     return (
         <ChartUsers userTypes={this.state.userTypes} userCount={userCount} />
@@ -107,14 +100,14 @@ class App extends Component {
           <label className="one-half column energyStorage">
             <p>Charge Efficiency</p>
             <input type="number" step="2" value={this.state.cEfficiency} required
-            min={defaultCEfficiency-4} max={defaultCEfficiency+4}
+            min={Constraints.defaultCEfficiency-4} max={Constraints.defaultCEfficiency+4}
             name= "cEfficiency" onChange={this.handleChange} /> %
           </label>
 
           <label className="one-half column energyStorage">
             <p>Discharging Efficiency</p>
             <input type="number" step="2" value={this.state.dEfficiency} required
-            min={defaultDEfficiency-4} max={defaultDEfficiency+4}
+            min={Constraints.defaultDEfficiency-4} max={Constraints.defaultDEfficiency+4}
             name= "dEfficiency" onChange={this.handleChange} /> %
           </label>
         </div>
@@ -122,14 +115,14 @@ class App extends Component {
           <label className="one-half column energyStorage">
             <p>Capacity</p>
             <input type="number" step="2" value={this.state.capacity} required
-            min={defaultCapacity-4} max={defaultCapacity+4}
+            min={Constraints.defaultCapacity-4} max={Constraints.defaultCapacity+4}
             name= "capacity" onChange={this.handleChange} /> kWh
           </label>
 
           <label className="one-half column energyStorage">
             <p>Max Charge Rate</p>
             <input type="number" step="2" value={this.state.maxChargeRate} required
-            min={defaultMaxChargeRate-4} max={defaultMaxChargeRate+4}
+            min={Constraints.defaultMaxChargeRate-4} max={Constraints.defaultMaxChargeRate+4}
             name= "maxChargeRate" onChange={this.handleChange} /> kWh per hour
           </label>
         </div>
@@ -137,7 +130,7 @@ class App extends Component {
           <label className="energyStorage">
             <p>Leakage Rate</p>
             <input type="number" step="2" value={this.state.leakRate} required
-            min={defaultLeakRate-4} max={defaultLeakRate+4}
+            min={Constraints.defaultLeakRate-4} max={Constraints.defaultLeakRate+4}
             name= "leakRate" onChange={this.handleChange} /> %
           </label>
         </div>
@@ -152,7 +145,7 @@ class App extends Component {
             <label>
               <p>Max Hourly Production</p>
               <input type="number" step="2" value={this.state.maxHourlyProduction} required
-              min={defaultMaxHourlyProduction-4} max={defaultMaxHourlyProduction+4}
+              min={Constraints.defaultMaxHourlyProduction-4} max={Constraints.defaultMaxHourlyProduction+4}
               name= "maxHourlyProduction" onChange={this.handleChange} /> kWh
             </label>
           </div>
@@ -160,7 +153,7 @@ class App extends Component {
             <label>
               <p>Max Daily Production</p>
               <input type="number" step="2" value={this.state.maxDailyProduction} required
-              min={defaultMaxDailyProduction-4} max={defaultMaxDailyProduction+4}
+              min={Constraints.defaultMaxDailyProduction-4} max={Constraints.defaultMaxDailyProduction+4}
               name= "maxDailyProduction" onChange={this.handleChange} /> kWh
             </label>
           </div>
@@ -244,12 +237,12 @@ class App extends Component {
               {this.renderSimulate()}
             </div>
 
-            <div className="row chart-section">
-              <div className="one-half column">
+            <div className="chart-section">
+              <div className="row">
                 <h6 className="graph-header"> Aggregate Load </h6>
-                <ChartAgg activeLoad={this.props.activeLoad}/>
+                <ChartAgg activeLoad={this.props.activeLoad} />
               </div>
-              <div className="one-half column">
+              <div className="row">
                 <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
                 {this.renderChartPrice()}
               </div>

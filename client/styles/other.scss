@@ -25,9 +25,19 @@
   padding-top: 1em;
 }
 
+.simulate {
+  text-align: center;
+}
+
+#run {
+  margin-top: 10px;
+  background-color: $run-color;
+  color: $run-text-color;
+  width: 100%;
+}
 
 .chart-section {
-  margin-top: 1.5rem;
+  margin-top: -1rem;
   padding-top: 1rem;
   padding-left: 1rem;
   padding-right: 1rem;
@@ -35,14 +45,9 @@
   background-color: $chart-background-color;
 }
 
-.simulate {
-  text-align: center;
-}
-
 
 .footer-wrapper {
   padding-top: 100px;
-
 }
 
 #footer {
@@ -57,12 +62,7 @@ footer:after {
   visibility: hidden;
 }
 
-#run {
-  margin-top: -10px;
-  background-color: $run-color;
-  color: $run-text-color;
-  width: 100%;
-}
+
 
 
 /* Links
