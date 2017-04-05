@@ -161,10 +161,6 @@ class App extends Component {
     )
   }
 
-  renderChartPrice() {
-    // return <ChartPrice data={priceData}/>
-  }
-
   handleChange(event) {
     const target = event.target;
     const value = parseInt(target.value);
@@ -244,7 +240,7 @@ class App extends Component {
               </div>
               <div className="row">
                 <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
-                {this.renderChartPrice()}
+                <ChartPrice passiveValues={this.props.passiveLoad.values} activeValues={this.props.activeLoad.values}/>
               </div>
             </div>
 
@@ -274,10 +270,9 @@ export default createContainer(({ params }) => {
   const passiveLoadExists = !loading && !!passiveLoad;
   const activeLoad = AggLoads.findOne({active: true});
   const activeLoadExists = !loading && !!activeLoad;
-
   return {
     loading,
-    activeLoad: activeLoadExists   ? {n:  activeLoad.n, values:_.values(activeLoad.l)}  : {n: 0,values: []},
-    passiveLoad: passiveLoadExists ? {n: passiveLoad.n, values:_.values(passiveLoad.l)} : {n: 0, values: []},
+    activeLoad: activeLoadExists   ? { n:  activeLoad.n, values: _.values(activeLoad.l) }  : { n: 0, values: [] },
+    passiveLoad: passiveLoadExists ? { n: passiveLoad.n, values: _.values(passiveLoad.l) } : { n: 0, values: [] },
   };
 }, App);

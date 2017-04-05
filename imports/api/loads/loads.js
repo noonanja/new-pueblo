@@ -79,10 +79,3 @@ Loads.deny({
   update() { return true; },
   remove() { return true; },
 });
-
-// Loads.publicFields = {
-//   userId: 1,
-//   e: 1,
-//   // s_n: 1,
-//   // g_n: 1,
-// };
