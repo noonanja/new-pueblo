@@ -15,7 +15,7 @@ export const resize = new ValidatedMethod({
   }).validator(),
   run({count, hasStore, hasGen}) {
     if (count > 0) {
-      for (i = 0; i < Math.abs(count); i++) {
+      for (i = 0; i < count; i++) {
         Users.insert({
           hasStore: hasStore,
           hasGen: hasGen
@@ -23,12 +23,10 @@ export const resize = new ValidatedMethod({
       }
     }
     else if (count < 0) {
-      for (i = 0; i < Math.abs(count); i++) {
-        Users.removeOne({
-          hasStore: hasStore,
-          hasGen: hasGen
-        });
-      }
+      const toRemove = Users.find({hasStore: hasStore, hasGen: hasGen}, {limit: Math.abs(count)}).map(function(doc) {
+        return doc._id;
+      });
+      return Users.remove({_id: {$in: toRemove}});
     }
   }
 });
@@ -56,7 +54,7 @@ export const simulate = new ValidatedMethod({
 
     // insert passive
     const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
-    const passiveChanged = Constraints.userCount - (passiveUsers + userTypes[2])
+    const passiveChanged = Constraints.userCount - (passiveUsers + userTypes[2]);
     Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
       if (error) {
         console.log(error);

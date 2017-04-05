@@ -2,12 +2,9 @@ import { Meteor } from 'meteor/meteor';
 
 import { AggLoads } from '../aggLoads.js';
 
+import { Schema } from '../../schema.js';
 
-AggLoads.publicFields = {
-  active: 1,
-  l:1,
-};
 
 Meteor.publish('aggLoads', function loadsPublication() {
-  return AggLoads.find({}, {fields: AggLoads.publicFields});
+  return AggLoads.find({}, {fields: Schema.publicFields.AggLoads});
 });

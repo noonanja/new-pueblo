@@ -2,12 +2,8 @@ import { Meteor } from 'meteor/meteor';
 
 import { Users } from '../users.js';
 
-
-Users.publicFields = {
-  hasGen: 1,
-  hasStore: 1,
-};
+import { Schema } from '../../schema.js';
 
 Meteor.publish('users', function usersPublication() {
-  return Users.find({fields: Users.publicFields});
+  return Users.find({fields: Schema.PublicFields.Users});
 });

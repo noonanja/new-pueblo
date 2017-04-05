@@ -1,45 +1,49 @@
 export const Schema = {};
+Schema.publicFields = {};
 
-Schema.consumption = new SimpleSchema({
-  h1: {type: Number, decimal: true},
-  h2: {type: Number, decimal: true},
-  h3: {type: Number, decimal: true},
-  h4: {type: Number, decimal: true},
-  h5: {type: Number, decimal: true},
-  h6: {type: Number, decimal: true},
-  h7: {type: Number, decimal: true},
-  h8: {type: Number, decimal: true},
-  h9: {type: Number, decimal: true},
-  h10: {type: Number, decimal: true},
-  h11: {type: Number, decimal: true},
-  h12: {type: Number, decimal: true},
-  h13: {type: Number, decimal: true},
-  h14: {type: Number, decimal: true},
-  h15: {type: Number, decimal: true},
-  h16: {type: Number, decimal: true},
-  h17: {type: Number, decimal: true},
-  h18: {type: Number, decimal: true},
-  h19: {type: Number, decimal: true},
-  h20: {type: Number, decimal: true},
-  h21: {type: Number, decimal: true},
-  h22: {type: Number, decimal: true},
-  h23: {type: Number, decimal: true},
-  h24: {type: Number, decimal: true},
-});
+Schema.schedule = new SimpleSchema(
+  _.range(1, 25).reduce(function(acc, cur, i) {
+      acc[`h${i+1}`] =  {type: Number, decimal: true};
+      return acc;
+  }, {})
+);
 
-AggSchema = new SimpleSchema({
+
+Schema.aggLoads = new SimpleSchema({
   active: {type: Boolean},
   n : {type: Number},
-  l: {type: Schema.consumption},
+  l: {type: Schema.schedule},
 });
+
+Schema.publicFields.AggLoads = {
+  active: 1,
+  n:1,
+  l:1,
+};
 
 Schema.loads = new SimpleSchema({
   userId: { type: String},
-  e: {type: Schema.consumption},
+  l: {type: Schema.schedule},
+  e: {type: Schema.schedule},
+  s: {type: Schema.schedule, optional: true},
+  g: {type: Schema.schedule, optional: true},
   // ts: {type: Date},
 });
+
+Schema.publicFields.Loads = {
+  userId: 1,
+  l:1,
+  e:1,
+  s:1,
+  g:1,
+};
 
 Schema.users = new SimpleSchema({
   hasStore: { type: Boolean },
   hasGen: { type: Boolean },
 });
+
+Schema.publicFields.Users = {
+  hasGen: 1,
+  hasStore: 1,
+};

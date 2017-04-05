@@ -6,49 +6,67 @@ import { AggLoads } from '../aggLoads/aggLoads.js'
 import { Schema } from '../schema.js';
 
 const aggLoadDenormalizer = {
-  afterInsertLoad(loadId) {
-    load = Loads.findOne({_id: loadId});
-    user = Users.findOne({_id: load.userId});
+  afterInsertLoad(load) {
     AggLoads.update(
-      {active: (user.hasGen || user.hasStore)},
+      {active: (!!load.s || !!load.g)},
       {
         $inc: {
             n: 1,
-            "l.h1":  load.e.h1,  "l.h2":  load.e.h2,  "l.h3":  load.e.h3,  "l.h4":  load.e.h4,
-            "l.h5":  load.e.h5,  "l.h6":  load.e.h6,  "l.h7":  load.e.h7,  "l.h8":  load.e.h8,
-            "l.h9":  load.e.h9,  "l.h10": load.e.h10, "l.h11": load.e.h11, "l.h12": load.e.h12,
-            "l.h13": load.e.h13, "l.h14": load.e.h14, "l.h15": load.e.h15, "l.h16": load.e.h16,
-            "l.h17": load.e.h17, "l.h18": load.e.h18, "l.h19": load.e.h19, "l.h20": load.e.h20,
-            "l.h21": load.e.h21, "l.h22": load.e.h22, "l.h23": load.e.h23, "l.h24": load.e.h24,
+            "l.h1":  load.l.h1,  "l.h2":  load.l.h2,  "l.h3":  load.l.h3,  "l.h4":  load.l.h4,
+            "l.h5":  load.l.h5,  "l.h6":  load.l.h6,  "l.h7":  load.l.h7,  "l.h8":  load.l.h8,
+            "l.h9":  load.l.h9,  "l.h10": load.l.h10, "l.h11": load.l.h11, "l.h12": load.l.h12,
+            "l.h13": load.l.h13, "l.h14": load.l.h14, "l.h15": load.l.h15, "l.h16": load.l.h16,
+            "l.h17": load.l.h17, "l.h18": load.l.h18, "l.h19": load.l.h19, "l.h20": load.l.h20,
+            "l.h21": load.l.h21, "l.h22": load.l.h22, "l.h23": load.l.h23, "l.h24": load.l.h24,
         },
         $setOnInsert: {
-            active: (user.hasGen || user.hasStore),
+            active: (!!load.s || !!load.g),
             n: 1,
             l: {
-              h1:  load.e.h1,  h2:  load.e.h2,  h3:  load.e.h3,  h4:  load.e.h4,
-              h5:  load.e.h5,  h6:  load.e.h6,  h7:  load.e.h7,  h8:  load.e.h8,
-              h9:  load.e.h9,  h10: load.e.h10, h11: load.e.h11, h12: load.e.h12,
-              h13: load.e.h13, h14: load.e.h14, h15: load.e.h15, h16: load.e.h16,
-              h17: load.e.h17, h18: load.e.h18, h19: load.e.h19, h20: load.e.h20,
-              h21: load.e.h21, h22: load.e.h22, h23: load.e.h23, h24: load.e.h24,
+              h1:  load.l.h1,  h2:  load.l.h2,  h3:  load.l.h3,  h4:  load.l.h4,
+              h5:  load.l.h5,  h6:  load.l.h6,  h7:  load.l.h7,  h8:  load.l.h8,
+              h9:  load.l.h9,  h10: load.l.h10, h11: load.l.h11, h12: load.l.h12,
+              h13: load.l.h13, h14: load.l.h14, h15: load.l.h15, h16: load.l.h16,
+              h17: load.l.h17, h18: load.l.h18, h19: load.l.h19, h20: load.l.h20,
+              h21: load.l.h21, h22: load.l.h22, h23: load.l.h23, h24: load.l.h24,
             }
         },
       },
       {upsert: true},
     );
+  },
+  afterRemoveLoad(load) {
+    AggLoads.update(
+      {active: (!!load.s || !!load.g) },
+      {
+        $inc: {
+            n: -1,
+            "l.h1":  -load.l.h1,  "l.h2":  -load.l.h2,  "l.h3":  -load.l.h3,  "l.h4":  -load.l.h4,
+            "l.h5":  -load.l.h5,  "l.h6":  -load.l.h6,  "l.h7":  -load.l.h7,  "l.h8":  -load.l.h8,
+            "l.h9":  -load.l.h9,  "l.h10": -load.l.h10, "l.h11": -load.l.h11, "l.h12": -load.l.h12,
+            "l.h13": -load.l.h13, "l.h14": -load.l.h14, "l.h15": -load.l.h15, "l.h16": -load.l.h16,
+            "l.h17": -load.l.h17, "l.h18": -load.l.h18, "l.h19": -load.l.h19, "l.h20": -load.l.h20,
+            "l.h21": -load.l.h21, "l.h22": -load.l.h22, "l.h23": -load.l.h23, "l.h24": -load.l.h24,
+        },
+      }
+    );
   }
+
 };
 
 class LoadsCollection extends Mongo.Collection {
   insert(load, callback) {
     const result = super.insert(load, callback);
-    aggLoadDenormalizer.afterInsertLoad(result);
+    aggLoadDenormalizer.afterInsertLoad(this.findOne(result));
     return result;
   }
-  // remove(selector, callback) {
-  //   Loads.remove({userId: selector});
-  //   return super.remove(selector, callback);
-  // }
+  remove(selector, callback) {
+    this.find(selector).map(function(load) {
+      aggLoadDenormalizer.afterRemoveLoad(load);
+    });
+    const result = super.remove(selector, callback);
+    return result;
+  }
 }
 
 // export const Loads = new LoadsCollection('loads'); // syncs with server
