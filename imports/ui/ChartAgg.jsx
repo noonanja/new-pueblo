@@ -18,19 +18,41 @@ const aggOptions = { scales: {
 
 export default class ChartAgg extends Component {
   chartAggData() {
-    const values = this.props.passiveLoad.values;
-    const labels = _.range(1, values.length+1);
+    const passiveValues = this.props.passiveLoad.values;
+    const activeValues = this.props.activeLoad.values;
     let i = 0;
-    while(i < values.length) {
-      values[i] = parseFloat(values[i]).toFixed(2);
+    while(i < passiveValues.length) {
+      passiveValues[i] = parseFloat(passiveValues[i]).toFixed(2);
       i++;
     }
+    i = 0;
+    while(i < activeValues.length) {
+      activeValues[i] = parseFloat(activeValues[i]).toFixed(2);
+      i++;
+    }
+    const labels = _.range(1, passiveValues.length+1);
     return {
       labels: labels,
       datasets: [{
         label: `Aggregate Passive Load (n=${this.props.passiveLoad.n})`,
+        backgroundColor: [
+          "#455A64","#455A64","#455A64","#455A64","#455A64","#455A64","#455A64",
+          "#455A64","#455A64","#455A64","#455A64","#455A64","#455A64","#455A64",
+          "#455A64","#455A64","#455A64","#455A64","#455A64","#455A64","#455A64",
+          "#455A64","#455A64","#455A64",
+        ],
         borderWidth: 1,
-        data: values,
+        data: passiveValues,
+      }, {
+        label: `Aggregate Active Load (n=${this.props.activeLoad.n})`,
+        backgroundColor: [
+          "#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56",
+          "#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56",
+          "#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56",
+          "#FFCE56","#FFCE56","#FFCE56",
+        ],
+        borderWidth: 1,
+        data: activeValues,
       }]
     }
   }
@@ -44,5 +66,5 @@ export default class ChartAgg extends Component {
 
 ChartAgg.propTypes = {
   passiveLoad: React.PropTypes.object,
-  // activeLoad: React.PropTypes.object,
+  activeLoad: React.PropTypes.object,
 };
