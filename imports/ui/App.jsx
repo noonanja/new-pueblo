@@ -75,6 +75,14 @@ class App extends Component {
     });
   }
 
+  updatePassiveUsers(values) {
+    Meteor.call('users.resizePassive', {userTypes: this.state.userTypes}, (err, res) => {
+      if (err) {
+        alert(err);
+      }
+    });
+  }
+
   renderChartUsers() {
     return (
         <ChartUsers userTypes={this.state.userTypes} userCount={userCount} />
@@ -84,11 +92,11 @@ class App extends Component {
   renderRange() {
     return (
         <div className="range">
-        <Range
-          handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
-          ref= "range" min={0} max={maxActive} pushable={true}
-          defaultValue={defaultUserTypes} step={defaultStep} included={false}
-          marks ={marks} />
+          <Range
+            handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
+            onAfterChange={this.updatePassiveUsers.bind(this)} ref= "range"
+            min={0} max={maxActive} pushable={true} marks ={marks}
+            defaultValue={defaultUserTypes} step={defaultStep} included={false}/>
         </div>
     )
   }

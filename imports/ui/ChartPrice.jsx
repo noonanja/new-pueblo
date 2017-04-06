@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 const BarChart = require("react-chartjs-2").Bar;
 
-import { gridPrices } from '../api/loads/hourlyStats.js';
+import { gridK } from '../api/loads/hourlyStats.js';
 
 const aggOptions = { scales: {
                   // xAxes: [{
@@ -19,19 +19,22 @@ const aggOptions = { scales: {
                   };
 
 export default class ChartPrice extends Component {
+  gridCost(value, i) {
+    return (Math.pow(value/1000, 2) * gridK[i]).toFixed(2);
+  }
+
   chartPriceData() {
-    const passiveValues = this.props.passiveValues;
-    const activeValues = this.props.activeValues;
-    console.log(activeValues);
+    const passiveValues = this.props.passiveValues.slice(0);
     const initialPrices = [];
-    const finalPrices = [];
-    for (var i = 0; i < activeValues.length; i++) {
-      finalPrices.push((Math.pow(passiveValues[i]+parseFloat(activeValues[i]),2)*gridPrices[i+1]).toFixed(2));
-    }
-    i = 0;
+    let i = 0;
     while(i < passiveValues.length) {
-      initialPrices[i] = parseFloat(Math.pow(passiveValues[i],2)*gridPrices[i+1]).toFixed(2);
+      initialPrices[i] = this.gridCost(passiveValues[i], i+1);
       i++;
+    }
+    const finalPrices = [];
+    const activeValues = this.props.activeValues.slice(0);
+    for (i = 0; i < activeValues.length; i++) {
+      finalPrices.push(this.gridCost(passiveValues[i]+activeValues[i], i+1));
     }
     const labels = _.range(1, passiveValues.length+1);
     return {

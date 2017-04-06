@@ -18,13 +18,13 @@ const aggOptions = { scales: {
 
 export default class ChartAgg extends Component {
   chartAggData() {
-    // create copies of the arrays 
+    // create copies of the arrays
     const passiveValues = this.props.passiveLoad.values.slice(0);
     const activeValues = this.props.activeLoad.values.slice(0);
     let i = 0;
     const totalValues = [];
     for (i = 0; i < passiveValues.length; i++) {
-      totalValues.push(passiveValues[i]+activeValues[i]);
+      totalValues.push((passiveValues[i]+activeValues[i]).toFixed(2));
     }
     while(i < passiveValues.length) {
       passiveValues[i] = parseFloat(passiveValues[i]).toFixed(2);

@@ -38,7 +38,7 @@ export function drawConsumption() {
   }, {});
 }
 
-export const gridPrices = {
+export const gridK = {
     1:	0.106,
     2:	0.106,
     3:	0.106,
