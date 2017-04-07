@@ -12,24 +12,26 @@ const aggLoadDenormalizer = {
       {
         $inc: {
             n: 1,
-            "l.h1":  load.l.h1,  "l.h2":  load.l.h2,  "l.h3":  load.l.h3,  "l.h4":  load.l.h4,
-            "l.h5":  load.l.h5,  "l.h6":  load.l.h6,  "l.h7":  load.l.h7,  "l.h8":  load.l.h8,
-            "l.h9":  load.l.h9,  "l.h10": load.l.h10, "l.h11": load.l.h11, "l.h12": load.l.h12,
-            "l.h13": load.l.h13, "l.h14": load.l.h14, "l.h15": load.l.h15, "l.h16": load.l.h16,
-            "l.h17": load.l.h17, "l.h18": load.l.h18, "l.h19": load.l.h19, "l.h20": load.l.h20,
-            "l.h21": load.l.h21, "l.h22": load.l.h22, "l.h23": load.l.h23, "l.h24": load.l.h24,
+            "l.0":  load.l[0],
+            "l.1":  load.l[1],  "l.2":  load.l[2],  "l.3":  load.l[3],  "l.4":  load.l[4],
+            "l.5":  load.l[5],  "l.6":  load.l[6],  "l.7":  load.l[7],  "l.8":  load.l[8],
+            "l.9":  load.l[9],  "l.10": load.l[10], "l.11": load.l[11], "l.12": load.l[12],
+            "l.13": load.l[13], "l.14": load.l[14], "l.15": load.l[15], "l.16": load.l[16],
+            "l.17": load.l[17], "l.18": load.l[18], "l.19": load.l[19], "l.20": load.l[20],
+            "l.21": load.l[21], "l.22": load.l[22], "l.23": load.l[23],
         },
         $setOnInsert: {
             active: (!!load.s || !!load.g),
             n: 1,
-            l: {
-              h1:  load.l.h1,  h2:  load.l.h2,  h3:  load.l.h3,  h4:  load.l.h4,
-              h5:  load.l.h5,  h6:  load.l.h6,  h7:  load.l.h7,  h8:  load.l.h8,
-              h9:  load.l.h9,  h10: load.l.h10, h11: load.l.h11, h12: load.l.h12,
-              h13: load.l.h13, h14: load.l.h14, h15: load.l.h15, h16: load.l.h16,
-              h17: load.l.h17, h18: load.l.h18, h19: load.l.h19, h20: load.l.h20,
-              h21: load.l.h21, h22: load.l.h22, h23: load.l.h23, h24: load.l.h24,
-            }
+            l: [
+              load.l[0],
+              load.l[1],  load.l[2],  load.l[3],  load.l[4],
+              load.l[5],  load.l[6],  load.l[7],  load.l[8],
+              load.l[9],  load.l[10], load.l[11], load.l[12],
+              load.l[13], load.l[14], load.l[15], load.l[16],
+              load.l[17], load.l[18], load.l[19], load.l[20],
+              load.l[21], load.l[22], load.l[23],
+            ]
         },
       },
       {upsert: true},
@@ -41,12 +43,13 @@ const aggLoadDenormalizer = {
       {
         $inc: {
             n: -1,
-            "l.h1":  -load.l.h1,  "l.h2":  -load.l.h2,  "l.h3":  -load.l.h3,  "l.h4":  -load.l.h4,
-            "l.h5":  -load.l.h5,  "l.h6":  -load.l.h6,  "l.h7":  -load.l.h7,  "l.h8":  -load.l.h8,
-            "l.h9":  -load.l.h9,  "l.h10": -load.l.h10, "l.h11": -load.l.h11, "l.h12": -load.l.h12,
-            "l.h13": -load.l.h13, "l.h14": -load.l.h14, "l.h15": -load.l.h15, "l.h16": -load.l.h16,
-            "l.h17": -load.l.h17, "l.h18": -load.l.h18, "l.h19": -load.l.h19, "l.h20": -load.l.h20,
-            "l.h21": -load.l.h21, "l.h22": -load.l.h22, "l.h23": -load.l.h23, "l.h24": -load.l.h24,
+            "l.0":  -load.l[0],
+            "l.1":  -load.l[1],  "l.2":  -load.l[2],  "l.3":  -load.l[3],  "l.4":  -load.l[4],
+            "l.5":  -load.l[5],  "l.6":  -load.l[6],  "l.7":  -load.l[7],  "l.8":  -load.l[8],
+            "l.9":  -load.l[9],  "l.10": -load.l[10], "l.11": -load.l[11], "l.12": -load.l[12],
+            "l.13": -load.l[13], "l.14": -load.l[14], "l.15": -load.l[15], "l.16": -load.l[16],
+            "l.17": -load.l[17], "l.18": -load.l[18], "l.19": -load.l[19], "l.20": -load.l[20],
+            "l.21": -load.l[21], "l.22": -load.l[22], "l.23": -load.l[23],
         },
       }
     );
@@ -79,3 +82,14 @@ Loads.deny({
   update() { return true; },
   remove() { return true; },
 });
+
+
+// Loads.helpers({
+//   otherActiveAgg(l) {
+//     return
+//   }
+//
+//   todos() {
+//     return Todos.find({ listId: this._id }, { sort: { createdAt: -1 } });
+//   },
+// });

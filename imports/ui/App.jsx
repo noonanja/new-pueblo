@@ -280,7 +280,7 @@ export default createContainer(({ params }) => {
   const activeLoadExists = !loading && !!activeLoad;
   return {
     loading,
-    activeLoad: activeLoadExists   ? { n:  activeLoad.n, values: _.values(activeLoad.l) }  : { n: 0, values: [] },
-    passiveLoad: passiveLoadExists ? { n: passiveLoad.n, values: _.values(passiveLoad.l) } : { n: 0, values: [] },
+    activeLoad: activeLoadExists   ? { n:  activeLoad.n, values: activeLoad.l  } : { n: 0, values: [] },
+    passiveLoad: passiveLoadExists ? { n: passiveLoad.n, values: passiveLoad.l } : { n: 0, values: [] },
   };
 }, App);

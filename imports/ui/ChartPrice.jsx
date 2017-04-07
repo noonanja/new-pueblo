@@ -20,7 +20,7 @@ const aggOptions = { scales: {
 
 export default class ChartPrice extends Component {
   gridCost(value, i) {
-    return (Math.pow(value/1000, 2) * gridK[i]).toFixed(2);
+    return (Math.pow(value/1000, 2) * gridK[i]).toFixed(3);
   }
 
   chartPriceData() {

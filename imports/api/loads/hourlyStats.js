@@ -32,10 +32,9 @@ const consumptionDistribution = hourlyMeanVariance.map(function({mean, vrnc}) {
 })
 
 export function drawConsumption() {
-  return consumptionDistribution.reduce(function(result, distr, i) {
-    result[`h${i+1}`] = distr.ppf(Math.random());
-    return result;
-  }, {});
+  return consumptionDistribution.map(function(distr) {
+    return distr.ppf(Math.random());
+  });
 }
 
 export const gridK = {

@@ -26,13 +26,14 @@ export default class ChartAgg extends Component {
     for (i = 0; i < passiveValues.length; i++) {
       totalValues.push((passiveValues[i]+activeValues[i]).toFixed(2));
     }
+    i = 0;
     while(i < passiveValues.length) {
-      passiveValues[i] = parseFloat(passiveValues[i]).toFixed(2);
+      passiveValues[i] = (passiveValues[i]).toFixed(2);
       i++;
     }
     i = 0;
     while(i < activeValues.length) {
-      activeValues[i] = parseFloat(activeValues[i]).toFixed(2);
+      activeValues[i] = (activeValues[i]).toFixed(2);
       i++;
     }
     const labels = _.range(1, passiveValues.length+1);

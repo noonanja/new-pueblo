@@ -97,6 +97,12 @@ export const simulate = new ValidatedMethod({
       }
     });
 
-  },
+    // passiveLoad = AggLoads.findOne({active: false});
+    // activeLoad  = AggLoads.findOne({active: true});
+    //
+    // const f_n = function(g, s) {
+    //
+    // }
 
+  },
 });

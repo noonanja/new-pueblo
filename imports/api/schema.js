@@ -2,17 +2,18 @@ export const Schema = {};
 Schema.publicFields = {};
 
 Schema.schedule = new SimpleSchema(
-  _.range(1, 25).reduce(function(acc, cur, i) {
-      acc[`h${i+1}`] =  {type: Number, decimal: true};
-      return acc;
-  }, {})
+
+  // _.range(1, 25).reduce(function(acc, cur, i) {
+  //     acc[`h${i+1}`] =  {type: Number, decimal: true};
+  //     return acc;
+  // }, {})
 );
 
 
 Schema.aggLoads = new SimpleSchema({
   active: {type: Boolean},
   n : {type: Number},
-  l: {type: Schema.schedule},
+  l: {type: [Number], decimal: true},
 });
 
 Schema.publicFields.AggLoads = {
@@ -23,10 +24,10 @@ Schema.publicFields.AggLoads = {
 
 Schema.loads = new SimpleSchema({
   userId: { type: String},
-  l: {type: Schema.schedule},
-  e: {type: Schema.schedule},
-  s: {type: Schema.schedule, optional: true},
-  g: {type: Schema.schedule, optional: true},
+  l: {type: [Number], decimal: true},
+  e: {type: [Number], decimal: true},
+  s: {type: [Number], decimal: true, optional: true},
+  g: {type: [Number], decimal: true, optional: true},
   // ts: {type: Date},
 });
 
