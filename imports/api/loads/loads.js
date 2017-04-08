@@ -85,11 +85,8 @@ Loads.deny({
 
 
 // Loads.helpers({
-//   otherActiveAgg(l) {
-//     return
+//   otherActiveAgg(activeLoad) {
+//     loadN = this.load.l;
+//     return Math.subtract(l, loadN)
 //   }
-//
-//   todos() {
-//     return Todos.find({ listId: this._id }, { sort: { createdAt: -1 } });
-//   },
 // });

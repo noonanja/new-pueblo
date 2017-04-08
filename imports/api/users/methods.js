@@ -97,12 +97,24 @@ export const simulate = new ValidatedMethod({
       }
     });
 
-    // passiveLoad = AggLoads.findOne({active: false});
-    // activeLoad  = AggLoads.findOne({active: true});
+    // passiveLoad = AggLoads.findOne({active: false}).l;
+    // activeLoad  = AggLoads.findOne({active: true}).l;
+    // Users.find({$or: [{hasStore: true}, {hasGen: true}]}).forEach(function(user) {
+    //   f_n = Infinity;
     //
-    // const f_n = function(g, s) {
+    //   loadNotN = Math.add(passiveLoad, Math.subtract(activeLoad, load.l));
     //
-    // }
-
+    //   if (user.hasStore && user.hasGen) {
+    //
+    //   }
+      // else if (user.hasStore) {
+      //
+      // }
+      // else {
+      //
+      // }
   },
+
+
+
 });
