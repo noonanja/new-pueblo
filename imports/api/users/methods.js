@@ -97,24 +97,18 @@ export const simulate = new ValidatedMethod({
       }
     });
 
-    // passiveLoad = AggLoads.findOne({active: false}).l;
-    // activeLoad  = AggLoads.findOne({active: true}).l;
-    // Users.find({$or: [{hasStore: true}, {hasGen: true}]}).forEach(function(user) {
-    //   f_n = Infinity;
-    //
-    //   loadNotN = Math.add(passiveLoad, Math.subtract(activeLoad, load.l));
-    //
-    //   if (user.hasStore && user.hasGen) {
-    //
-    //   }
-      // else if (user.hasStore) {
-      //
-      // }
-      // else {
-      //
-      // }
+    // Normally, programs happening within the Node environment would need to occur
+    // in Javascript. But because Child Process uses Node’s Command Line Interface,
+    // it can execute Python or Ruby files the exact same way the terminal would.
+    Meteor.call('consoleExecSync', (err, res) => {
+      if (err) {
+        console.log(err);
+      }
+      if (res) {
+        console.log(res);
+      }
+      console.log("called exec sync");
+    });
+
   },
-
-
-
 });
