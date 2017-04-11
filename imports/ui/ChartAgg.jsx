@@ -2,59 +2,33 @@ import React, { Component, PropTypes } from 'react';
 
 const BarChart = require("react-chartjs-2").Bar;
 
-const aggOptions = { scales: {
-                  // xAxes: [{
-                  //   stacked: true,
-                  //   ticks: {
-                  //     autoSkipPadding: 60,
-                  //   }
-                  // }],
-                  // yAxes: [{
-                  //   stacked: true
-                  // }],
-                    },
-                    responsive: true,
-                  };
+const aggOptions = { responsive: true, };
 
 export default class ChartAgg extends Component {
   chartAggData() {
     // create copies of the arrays
-    const passiveValues = this.props.passiveLoad.values.slice(0);
-    const activeValues = this.props.activeLoad.values.slice(0);
+    const initialValues = this.props.initialLoad.slice(0);
+    const finalValues = [];
+    // const finalValues = this.props.finalLoad.values.slice(0);
     let i = 0;
-    const totalValues = [];
-    for (i = 0; i < passiveValues.length; i++) {
-      totalValues.push((passiveValues[i]+activeValues[i]).toFixed(2));
-    }
-    i = 0;
-    while(i < passiveValues.length) {
-      passiveValues[i] = (passiveValues[i]).toFixed(2);
+    while(i < initialValues.length) {
+      initialValues[i] = (initialValues[i]).toFixed(2);
       i++;
     }
     i = 0;
-    while(i < activeValues.length) {
-      activeValues[i] = (activeValues[i]).toFixed(2);
-      i++;
-    }
-    const labels = _.range(1, passiveValues.length+1);
+    // while(i < finalValues.length) {
+    //   finalValues[i] = (finalValues[i]).toFixed(2);
+    //   i++;
+    // }
+    const labels = _.range(1, initialValues.length+1);
     return {
       labels: labels,
       datasets: [{
-        label: `Aggregate Passive Load (n=${this.props.passiveLoad.n})`,
+        label: `Aggregate Initial Load (0 active users)`,
         borderWidth: 1,
-        data: passiveValues,
+        data: initialValues,
       }, {
-        label: `Aggregate Active Load (n=${this.props.activeLoad.n})`,
-        backgroundColor: [
-          "#455A64","#455A64","#455A64","#455A64","#455A64","#455A64","#455A64",
-          "#455A64","#455A64","#455A64","#455A64","#455A64","#455A64","#455A64",
-          "#455A64","#455A64","#455A64","#455A64","#455A64","#455A64","#455A64",
-          "#455A64","#455A64","#455A64",
-        ],
-        borderWidth: 1,
-        data: activeValues,
-      }, {
-        label: `Aggregate Load (n=${this.props.activeLoad.n+this.props.passiveLoad.n})`,
+        label: `Aggregate Final Load (n=//)`,
         backgroundColor: [
           "#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56",
           "#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56","#FFCE56",
@@ -62,7 +36,7 @@ export default class ChartAgg extends Component {
           "#FFCE56","#FFCE56","#FFCE56",
         ],
         borderWidth: 1,
-        data: totalValues,
+        data: finalValues,
       }]
     }
   }
@@ -75,6 +49,6 @@ export default class ChartAgg extends Component {
 }
 
 ChartAgg.propTypes = {
-  passiveLoad: React.PropTypes.object,
-  activeLoad: React.PropTypes.object,
+  initialLoad: React.PropTypes.arrayOf(React.PropTypes.number),
+  // finalLoad: React.PropTypes.object,
 };

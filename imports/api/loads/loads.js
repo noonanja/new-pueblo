@@ -9,7 +9,7 @@ const aggLoadDenormalizer = {
   _updateAggLoad(load, addingLoad) {
     const c = addingLoad ? 1 : -1;
     AggLoads.update(
-      {active: (!!load.s || !!load.g)},
+      {initial: load.initial, active: (!!load.s || !!load.g)},
       {
         $inc: {
             n: c,
@@ -22,6 +22,7 @@ const aggLoadDenormalizer = {
             "l.21": c*load.l[21], "l.22": c*load.l[22], "l.23": c*load.l[23],
         },
         $setOnInsert: {
+            initial: load.initial,
             active: (!!load.s || !!load.g),
             n: 1,
             l: load.l,

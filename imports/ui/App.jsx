@@ -14,9 +14,7 @@ import ChartAgg from './ChartAgg.jsx';
 import ChartPrice from './ChartPrice.jsx';
 
 // Contraints for DERs drawn from paper
-import {Constraints} from '/lib/constraints.js';
-const userCount = Constraints.userCount;
-const maxActive = Constraints.maxActive;
+import { Constraints } from '/lib/constraints.js';
 
 // Range slider component
 import Range from 'rc-slider/lib/Range';
@@ -25,10 +23,8 @@ const Handle = Slider.Handle;
 const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
-// const defaultUserTypes= [40, 80, 120];
-// const defaultStep = 5;
-const defaultUserTypes= [4, 8, 12];
-const defaultStep = 2;
+const userCount = Constraints.userCount;
+const maxActive = Constraints.maxActive;
 const marks = {0: '0'};
 marks[maxActive]= `${maxActive}`;
 
@@ -39,7 +35,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      userTypes: defaultUserTypes,
+      userTypes: Constraints.defaultUserTypes,
       requirements: Constraints.defaultRequirements,
       cEfficiency: Constraints.defaultCEfficiency,
       dEfficiency: Constraints.defaultDEfficiency,
@@ -98,7 +94,7 @@ class App extends Component {
             handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
             onAfterChange={this.updatePassiveUsers.bind(this)} ref= "range"
             min={0} max={maxActive} pushable={true} marks ={marks}
-            defaultValue={defaultUserTypes} step={defaultStep} included={false}/>
+            defaultValue={Constraints.defaultUserTypes} step={Constraints.defaultStep} included={false}/>
         </div>
     )
   }
@@ -180,7 +176,7 @@ class App extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    Meteor.call('users.simulate', this.state, (err, res) => {
+    Meteor.call('users.simulate', {formInput: this.state}, (err, res) => {
       if (err) {
         alert(err);
       }
@@ -246,11 +242,11 @@ class App extends Component {
             <div className="chart-section">
               <div className="row">
                 <h6 className="graph-header"> Aggregate Load </h6>
-                <ChartAgg passiveLoad={this.props.passiveLoad} activeLoad={this.props.activeLoad}/>
+                <ChartAgg initialLoad={this.props.initialLoad} />
               </div>
               <div className="row">
                 <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
-                <ChartPrice passiveValues={this.props.passiveLoad.values} activeValues={this.props.activeLoad.values}/>
+                <ChartPrice initialValues={this.props.initialLoad} />
               </div>
             </div>
 
@@ -268,21 +264,21 @@ class App extends Component {
 }
 
 App.propTypes = {
-  passiveLoad: React.PropTypes.object,
-  activeLoad: React.PropTypes.object,
   loading: React.PropTypes.bool,
+  initialLoad: React.PropTypes.arrayOf(React.PropTypes.number),
+  // finalLoad: React.PropTypes.object,
 };
 
 export default createContainer(({ params }) => {
   const aggLoadsHandle = Meteor.subscribe('aggLoads');
   const loading = !aggLoadsHandle.ready();
-  const passiveLoad = AggLoads.findOne({active: false});
-  const passiveLoadExists = !loading && !!passiveLoad;
-  const activeLoad = AggLoads.findOne({active: true});
-  const activeLoadExists = !loading && !!activeLoad;
+  const initialLoad = AggLoads.findOne({initial: true});
+  const initialLoadExists = !loading && !!initialLoad;
+  // const finalLoad = AggLoads.find({initial: false}).fetch();
+  // const finalLoadExists = !loading && !!finalLoad;
   return {
     loading,
-    activeLoad: activeLoadExists   ? { n:  activeLoad.n, values: activeLoad.l  } : { n: 0, values: [] },
-    passiveLoad: passiveLoadExists ? { n: passiveLoad.n, values: passiveLoad.l } : { n: 0, values: [] },
+    initialLoad: initialLoadExists   ? initialLoad.l : [],
+    // finalLoad:   finalLoadExists     ? { values: finalLoad.l } : { n: 0, values: [] },
   };
 }, App);

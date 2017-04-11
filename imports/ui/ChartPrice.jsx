@@ -4,39 +4,25 @@ const BarChart = require("react-chartjs-2").Bar;
 
 import { gridK } from '../api/loads/hourlyStats.js';
 
-const aggOptions = { scales: {
-                  // xAxes: [{
-                  //   stacked: true,
-                  //   ticks: {
-                  //     autoSkipPadding: 60,
-                  //   }
-                  // }],
-                  // yAxes: [{
-                  //   stacked: true
-                  // }],
-                    },
-                    responsive: true,
-                  };
+const aggOptions = { responsive: true, };
 
 export default class ChartPrice extends Component {
-  gridCost(value, i) {
-    return (Math.pow(value/1000, 2) * gridK[i]).toFixed(3);
+  costPerKwH(value, h) {
+    return (Math.pow(value, 2) * gridK[h]).toFixed(5);
   }
 
   chartPriceData() {
-    const passiveValues = this.props.passiveValues.slice(0);
+    const initialValues = this.props.initialValues.slice(0);
+    // const finalValues = this.props.finalValues.slice(0);
     const initialPrices = [];
-    let i = 0;
-    while(i < passiveValues.length) {
-      initialPrices[i] = this.gridCost(passiveValues[i], i+1);
-      i++;
-    }
     const finalPrices = [];
-    const activeValues = this.props.activeValues.slice(0);
-    for (i = 0; i < activeValues.length; i++) {
-      finalPrices.push(this.gridCost(passiveValues[i]+activeValues[i], i+1));
+    for (i = 0; i < initialValues.length; i++) {
+      initialPrices.push(this.costPerKwH(initialValues[i], i+1));
     }
-    const labels = _.range(1, passiveValues.length+1);
+    // for (i = 0; i < activeValues.length; i++) {
+    //   finalPrices.push(this.costPerKwH(passiveValues[i]+activeValues[i], i+1));
+    // }
+    const labels = _.range(1, initialValues.length+1);
     return {
       labels: labels,
       datasets: [{
@@ -65,6 +51,6 @@ export default class ChartPrice extends Component {
 }
 
 ChartPrice.propTypes = {
-  passiveValues: React.PropTypes.arrayOf(React.PropTypes.number),
-  activeValues: React.PropTypes.arrayOf(React.PropTypes.number),
+  initialValues: React.PropTypes.arrayOf(React.PropTypes.number),
+  // activeValues: React.PropTypes.arrayOf(React.PropTypes.number),
 };
