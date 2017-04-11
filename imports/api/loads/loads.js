@@ -6,53 +6,52 @@ import { AggLoads } from '../aggLoads/aggLoads.js'
 import { Schema } from '../schema.js';
 
 const aggLoadDenormalizer = {
-  afterInsertLoad(load) {
+  _updateAggLoad(load, addingLoad) {
+    const c = addingLoad ? 1 : -1;
     AggLoads.update(
       {active: (!!load.s || !!load.g)},
       {
         $inc: {
-            n: 1,
-            "l.0":  load.l[0],
-            "l.1":  load.l[1],  "l.2":  load.l[2],  "l.3":  load.l[3],  "l.4":  load.l[4],
-            "l.5":  load.l[5],  "l.6":  load.l[6],  "l.7":  load.l[7],  "l.8":  load.l[8],
-            "l.9":  load.l[9],  "l.10": load.l[10], "l.11": load.l[11], "l.12": load.l[12],
-            "l.13": load.l[13], "l.14": load.l[14], "l.15": load.l[15], "l.16": load.l[16],
-            "l.17": load.l[17], "l.18": load.l[18], "l.19": load.l[19], "l.20": load.l[20],
-            "l.21": load.l[21], "l.22": load.l[22], "l.23": load.l[23],
+            n: c,
+            "l.0":  c*load.l[0],
+            "l.1":  c*load.l[1],  "l.2":  c*load.l[2],  "l.3":  c*load.l[3],  "l.4":  c*load.l[4],
+            "l.5":  c*load.l[5],  "l.6":  c*load.l[6],  "l.7":  c*load.l[7],  "l.8":  c*load.l[8],
+            "l.9":  c*load.l[9],  "l.10": c*load.l[10], "l.11": c*load.l[11], "l.12": c*load.l[12],
+            "l.13": c*load.l[13], "l.14": c*load.l[14], "l.15": c*load.l[15], "l.16": c*load.l[16],
+            "l.17": c*load.l[17], "l.18": c*load.l[18], "l.19": c*load.l[19], "l.20": c*load.l[20],
+            "l.21": c*load.l[21], "l.22": c*load.l[22], "l.23": c*load.l[23],
         },
         $setOnInsert: {
             active: (!!load.s || !!load.g),
             n: 1,
-            l: [
-              load.l[0],
-              load.l[1],  load.l[2],  load.l[3],  load.l[4],
-              load.l[5],  load.l[6],  load.l[7],  load.l[8],
-              load.l[9],  load.l[10], load.l[11], load.l[12],
-              load.l[13], load.l[14], load.l[15], load.l[16],
-              load.l[17], load.l[18], load.l[19], load.l[20],
-              load.l[21], load.l[22], load.l[23],
-            ]
+            l: load.l,
         },
       },
       {upsert: true},
     );
   },
-  afterRemoveLoad(load) {
-    AggLoads.update(
-      {active: (!!load.s || !!load.g) },
-      {
-        $inc: {
-            n: -1,
-            "l.0":  -load.l[0],
-            "l.1":  -load.l[1],  "l.2":  -load.l[2],  "l.3":  -load.l[3],  "l.4":  -load.l[4],
-            "l.5":  -load.l[5],  "l.6":  -load.l[6],  "l.7":  -load.l[7],  "l.8":  -load.l[8],
-            "l.9":  -load.l[9],  "l.10": -load.l[10], "l.11": -load.l[11], "l.12": -load.l[12],
-            "l.13": -load.l[13], "l.14": -load.l[14], "l.15": -load.l[15], "l.16": -load.l[16],
-            "l.17": -load.l[17], "l.18": -load.l[18], "l.19": -load.l[19], "l.20": -load.l[20],
-            "l.21": -load.l[21], "l.22": -load.l[22], "l.23": -load.l[23],
-        },
-      }
-    );
+  afterInsertLoad(load) {
+    return this._updateAggLoad(load, true);
+  },
+  beforeRemoveLoad(load) {
+    this._updateAggLoad(load, false);
+  },
+  beforeUpdateLoad(selector, modifier) {
+    // We only support very limited operations directly on loads
+    check(modifier, { $set: Object });
+
+    // We can only deal with $set modifiers, but that's all we do in this app
+    if (_.has(modifier.$set, 'checked')) {
+      Loads.find(selector).forEach((load) => {
+        this._updateAggLoad(load, false);
+      });
+    }
+
+  },
+  afterUpdateLoad(selector, modifier) {
+    Loads.find(selector).forEach((load) => {
+      this._updateAggLoad(load, true);
+    });
   }
 
 };
@@ -63,16 +62,23 @@ class LoadsCollection extends Mongo.Collection {
     aggLoadDenormalizer.afterInsertLoad(this.findOne(result));
     return result;
   }
+  update(selector, modifier) {
+    // remove this load from the aggregation
+    aggLoadDenormalizer.beforeUpdateLoad(selector, modifier);
+    const result = super.update(selector, modifier);
+    // add the updated load back to the aggregation
+    aggLoadDenormalizer.afterUpdateLoad(selector, modifier);
+    return result;
+  }
   remove(selector, callback) {
     this.find(selector).map(function(load) {
-      aggLoadDenormalizer.afterRemoveLoad(load);
+      aggLoadDenormalizer.beforeRemoveLoad(load);
     });
     const result = super.remove(selector, callback);
     return result;
   }
 }
 
-// export const Loads = new LoadsCollection('loads'); // syncs with server
 export const Loads = new LoadsCollection('loads', { connection: null } );
 
 Loads.attachSchema(Schema.loads);
@@ -82,11 +88,3 @@ Loads.deny({
   update() { return true; },
   remove() { return true; },
 });
-
-
-// Loads.helpers({
-//   otherActiveAgg(activeLoad) {
-//     loadN = this.load.l;
-//     return Math.subtract(l, loadN)
-//   }
-// });

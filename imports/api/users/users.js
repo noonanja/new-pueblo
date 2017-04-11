@@ -4,7 +4,7 @@ import { Mongo } from 'meteor/mongo';
 import { Loads } from '../loads/loads.js';
 import { AggLoads } from '../loads/loads.js';
 
-import {simulate} from './methods.js'
+import { simulate } from './methods.js'
 import { drawConsumption } from '../loads/hourlyStats.js';
 
 import { Schema } from '../schema.js';
@@ -12,8 +12,9 @@ import { Schema } from '../schema.js';
 const loadsDenormalizer = {
   afterInsertUser(userId, hasStore, hasGen) {
     const le = drawConsumption();
-    const s = hasStore ? drawConsumption() : null;
-    const g = hasGen ? drawConsumption() : null;
+    // Initialize active users with no storage/ generation strategies
+    const s = hasStore ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0) : null;
+    const g = hasGen ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0) : null;
     Loads.insert({
       userId: userId,
       l: le,
@@ -40,7 +41,6 @@ class UsersCollection extends Mongo.Collection {
   }
 }
 
-// export const Users = new UsersCollection('users'); // Server Collection
 export const Users = new UsersCollection('users', { connection: null } ); // local Collection
 
 Users.attachSchema(Schema.users);

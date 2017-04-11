@@ -25,8 +25,10 @@ const Handle = Slider.Handle;
 const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
 
-const defaultUserTypes= [40, 80, 120];
-const defaultStep = 5;
+// const defaultUserTypes= [40, 80, 120];
+// const defaultStep = 5;
+const defaultUserTypes= [4, 8, 12];
+const defaultStep = 2;
 const marks = {0: '0'};
 marks[maxActive]= `${maxActive}`;
 

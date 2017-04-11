@@ -3,6 +3,7 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method';
 import { Users } from './users.js';
 import { Loads } from '../loads/loads.js';
 import { AggLoads } from '../aggLoads/aggLoads.js';
+import { Console } from '../console/console.js'
 
 import { Constraints } from '/lib/constraints.js';
 
@@ -97,18 +98,45 @@ export const simulate = new ValidatedMethod({
       }
     });
 
-    // Normally, programs happening within the Node environment would need to occur
-    // in Javascript. But because Child Process uses Node’s Command Line Interface,
-    // it can execute Python or Ruby files the exact same way the terminal would.
-    Meteor.call('consoleExecSync', (err, res) => {
-      if (err) {
-        console.log(err);
-      }
-      if (res) {
-        console.log(res);
-      }
-      console.log("called exec sync");
-    });
+    if (Meteor.isServer) {
+      const cmd = "python " + "../../../../../server/.scripts/argmin.py";
+      passiveLoad = AggLoads.findOne({active: false});
+      // let countdown = 5;
+      // while (countdown > 1) {
+        activeLoad = AggLoads.findOne({active: true});
+        Users.find({active: true}).forEach(function(user) {
+              //////////////////////////////////////////////////////
+          // Given Aggregate Load and the constraints from the form-input,
+          // minimize the user's cost objective function
+            //////////////////////////////////////////////////////
+          load = Loads.find({userId: user._id});
+          let otherActiveAgg = Math.subtract(activeLoad, load.l);
+
+          let s_prime = _execSync(cmd, consoleInsert, consoleInsert);
+          let s = s_prime['s'];
+          let g = s_prime['g'];
+
+          // If the NE has been reached, each user updates their strategy "centroid"
+          Loads.update({userId: user._id},
+                       {
+                         $set : {
+                           l: Math.add(load.e, Math.subtract(s, g)),
+                           s: s,
+                           g: g,
+                         }
+                       }
+          );
+        });
+        // countdown -= 1;
+      // }
+    }
 
   },
 });
+
+const consoleInsert = function(_data) {
+  Console.insert({
+    timestamp : new Date().getTime(),
+    data : _data
+  });
+};

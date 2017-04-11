@@ -1,4 +1,6 @@
-import { Console } from '../console.js'
+// Normally, programs happening within the Node environment would need to occur
+// in Javascript. But because Child Process uses Node’s Command Line Interface,
+// it can execute Python files the exact same way the terminal would.
 
 exec = Npm.require('child_process').exec;
 
@@ -11,18 +13,4 @@ _execSync = function(cmd, stdoutHandler, stderrHandler) {
           stderrHandler(stderr);
       })
     );
-}
-
-Meteor.methods({
-  consoleExecSync : function() {
-    const cmd = "python " + "../../../../../server/.scripts/decomposition.py"
-    _execSync(cmd, consoleInsert, consoleInsert);
-  }
-});
-
-consoleInsert = function(_data) {
-  Console.insert({
-    timestamp : new Date().getTime(),
-    data : _data
-  });
 }
