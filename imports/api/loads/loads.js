@@ -9,15 +9,15 @@ import { Constraints } from '/lib/constraints.js';
 const aggLoadDenormalizer = {
   _updateAggLoad(load, addingLoad) {
     const initialAggLoad = AggLoads.findOne({initial: true});
-    let initial =  false;
+    let query = {active: (!!load.s || !!load.g), initial: false};
     if (!!initialAggLoad) {
       if (initialAggLoad.n < Constraints.userCount) {
-        initial = true;
+        query = {active: (!!load.s || !!load.g)};
       }
     }
     const c = addingLoad ? 1 : -1;
     AggLoads.update(
-      {active: (!!load.s || !!load.g), initial: initial},
+      query,
       {
         $inc: {
             n: c,
@@ -30,7 +30,6 @@ const aggLoadDenormalizer = {
             "l.21": c*load.l[21], "l.22": c*load.l[22], "l.23": c*load.l[23],
         },
         $setOnInsert: {
-            initial: initial,
             active: (!!load.s || !!load.g),
             n: 1,
             l: load.l,

@@ -31,8 +31,8 @@ Schema.publicFields.Loads = {
 
 
 Schema.aggLoads = new SimpleSchema({
-  initial: {type: Boolean},
   active: {type: Boolean},
+  initial: {type: Boolean, optional: true},
   n : {type: Number},
   l: {type: [Number], decimal: true},
 });

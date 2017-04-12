@@ -33,23 +33,6 @@ export const resize = new ValidatedMethod({
   }
 });
 
-// export const resizePassive = new ValidatedMethod({
-//   name: 'users.resizePassive',
-//   validate: new SimpleSchema({
-//     userTypes: {type: [Number]},
-//   }).validator(),
-//   run({userTypes}) {
-//     // resize passive
-//     const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
-//     const passiveChanged = Constraints.userCount - (passiveUsers + userTypes[2]);
-//     Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
-//       if (error) {
-//         console.log(error);
-//       }
-//     });
-//   },
-//
-// });
 
 export const simulate = new ValidatedMethod({
   name: 'users.simulate',
@@ -63,8 +46,10 @@ export const simulate = new ValidatedMethod({
     //     'Cannot edit todos in a private list that is not yours');
     // }
 
+    console.log(AggLoads.find().fetch());
+
     const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
-    const passiveChanged = Constraints.userCount - (passiveUsers + userTypes[2]);
+    const passiveChanged = Constraints.userCount - (passiveUsers + formInput.userTypes[2]);
     Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
       if (error) {
         console.log(error);
@@ -97,6 +82,8 @@ export const simulate = new ValidatedMethod({
         console.log(error);
       }
     });
+
+    console.log(AggLoads.find().fetch());
     //
     // if (Meteor.isServer) {
     //   const cmd = "python " + "../../../../../server/.scripts/argmin.py";
