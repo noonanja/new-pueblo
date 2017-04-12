@@ -7,7 +7,7 @@ export const AggLoads = new Mongo.Collection('aggLoads', { connection: null } );
 AggLoads.attachSchema(Schema.aggLoads);
 
 AggLoads.deny({
-  insert() { return true; },
-  update() { return true; },
+  // insert() { return true; },
+  // update() { return true; },
   remove() { return true; },
 });

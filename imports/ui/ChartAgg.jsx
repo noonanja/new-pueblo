@@ -7,7 +7,7 @@ const aggOptions = { responsive: true, };
 export default class ChartAgg extends Component {
   chartAggData() {
     // create copies of the arrays
-    const initialValues = this.props.initialLoad.slice(0);
+    const initialValues = this.props.initialLoad.values.slice(0);
     const finalValues = [];
     // const finalValues = this.props.finalLoad.values.slice(0);
     let i = 0;
@@ -24,7 +24,7 @@ export default class ChartAgg extends Component {
     return {
       labels: labels,
       datasets: [{
-        label: `Aggregate Initial Load (0 active users)`,
+        label: `Aggregate Initial Load (${this.props.initialLoad.n} passive users)`,
         borderWidth: 1,
         data: initialValues,
       }, {
@@ -49,6 +49,6 @@ export default class ChartAgg extends Component {
 }
 
 ChartAgg.propTypes = {
-  initialLoad: React.PropTypes.arrayOf(React.PropTypes.number),
+  initialLoad: React.PropTypes.object,
   // finalLoad: React.PropTypes.object,
 };

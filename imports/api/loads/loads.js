@@ -4,12 +4,20 @@ import { Mongo } from 'meteor/mongo';
 import { Users } from '../users/users.js';
 import { AggLoads } from '../aggLoads/aggLoads.js'
 import { Schema } from '../schema.js';
+import { Constraints } from '/lib/constraints.js';
 
 const aggLoadDenormalizer = {
   _updateAggLoad(load, addingLoad) {
+    const initialAggLoad = AggLoads.findOne({initial: true});
+    let initial =  false;
+    if (!!initialAggLoad) {
+      if (initialAggLoad.n < Constraints.userCount) {
+        initial = true;
+      }
+    }
     const c = addingLoad ? 1 : -1;
     AggLoads.update(
-      {initial: load.initial, active: (!!load.s || !!load.g)},
+      {active: (!!load.s || !!load.g), initial: initial},
       {
         $inc: {
             n: c,
@@ -22,13 +30,15 @@ const aggLoadDenormalizer = {
             "l.21": c*load.l[21], "l.22": c*load.l[22], "l.23": c*load.l[23],
         },
         $setOnInsert: {
-            initial: load.initial,
+            initial: initial,
             active: (!!load.s || !!load.g),
             n: 1,
             l: load.l,
         },
       },
-      {upsert: true},
+      // use "multi" to update both the document for the initial load
+      // and the document being used for the aggregate final load
+      {upsert: true, multi: true},
     );
   },
   afterInsertLoad(load) {

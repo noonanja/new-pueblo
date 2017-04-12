@@ -10,14 +10,13 @@ import { drawConsumption } from '../loads/hourlyStats.js';
 import { Schema } from '../schema.js';
 
 const loadsDenormalizer = {
-  afterInsertUser(userId, initial, hasStore, hasGen) {
+  afterInsertUser(userId, hasStore, hasGen) {
     const le = drawConsumption();
     // Initialize active users with no storage/ generation strategies
     const s = hasStore ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0) : null;
     const g = hasGen ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0) : null;
     Loads.insert({
       userId: userId,
-      initial: initial,
       l: le,
       e: le,
       s: s,
@@ -33,7 +32,7 @@ class UsersCollection extends Mongo.Collection {
   insert(user, callback) {
     // Call the original `insert` method, which will validate against the schema
     const result = super.insert(user, callback);
-    loadsDenormalizer.afterInsertUser(result, user.initial, user.hasStore, user.hasGen);
+    loadsDenormalizer.afterInsertUser(result, user.hasStore, user.hasGen);
     return result;
   }
   remove(selector, callback) {

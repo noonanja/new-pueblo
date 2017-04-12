@@ -13,14 +13,14 @@ export const resize = new ValidatedMethod({
   validate: new SimpleSchema({
       count: {type: Number},
       hasStore: {type: Boolean},
-      hasGen: {type: Boolean}
+      hasGen: {type: Boolean},
   }).validator(),
   run({count, hasStore, hasGen}) {
     if (count > 0) {
       for (i = 0; i < count; i++) {
         Users.insert({
           hasStore: hasStore,
-          hasGen: hasGen
+          hasGen: hasGen,
         });
       }
     }
@@ -33,23 +33,23 @@ export const resize = new ValidatedMethod({
   }
 });
 
-export const resizePassive = new ValidatedMethod({
-  name: 'users.resizePassive',
-  validate: new SimpleSchema({
-    userTypes: {type: [Number]},
-  }).validator(),
-  run({userTypes}) {
-    // resize passive
-    const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
-    const passiveChanged = Constraints.userCount - (passiveUsers + userTypes[2]);
-    Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
-      if (error) {
-        console.log(error);
-      }
-    });
-  },
-
-});
+// export const resizePassive = new ValidatedMethod({
+//   name: 'users.resizePassive',
+//   validate: new SimpleSchema({
+//     userTypes: {type: [Number]},
+//   }).validator(),
+//   run({userTypes}) {
+//     // resize passive
+//     const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
+//     const passiveChanged = Constraints.userCount - (passiveUsers + userTypes[2]);
+//     Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
+//       if (error) {
+//         console.log(error);
+//       }
+//     });
+//   },
+//
+// });
 
 export const simulate = new ValidatedMethod({
   name: 'users.simulate',
@@ -62,6 +62,14 @@ export const simulate = new ValidatedMethod({
     //   throw new Meteor.Error('todos.updateText.unauthorized',
     //     'Cannot edit todos in a private list that is not yours');
     // }
+
+    const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
+    const passiveChanged = Constraints.userCount - (passiveUsers + userTypes[2]);
+    Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
+      if (error) {
+        console.log(error);
+      }
+    });
 
     // insert storer-generators
     const sgCount = Users.find({hasStore: true, hasGen: true}).count();

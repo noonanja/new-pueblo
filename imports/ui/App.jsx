@@ -74,11 +74,11 @@ class App extends Component {
   }
 
   updatePassiveUsers(values) {
-    Meteor.call('users.resizePassive', {userTypes: this.state.userTypes}, (err, res) => {
-      if (err) {
-        alert(err);
-      }
-    });
+    // Meteor.call('users.resizePassive', {userTypes: this.state.userTypes}, (err, res) => {
+    //   if (err) {
+    //     alert(err);
+    //   }
+    // });
   }
 
   renderChartUsers() {
@@ -246,7 +246,7 @@ class App extends Component {
               </div>
               <div className="row">
                 <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
-                <ChartPrice initialValues={this.props.initialLoad} />
+                <ChartPrice initialValues={this.props.initialLoad.values} />
               </div>
             </div>
 
@@ -265,7 +265,7 @@ class App extends Component {
 
 App.propTypes = {
   loading: React.PropTypes.bool,
-  initialLoad: React.PropTypes.arrayOf(React.PropTypes.number),
+  initialLoad: React.PropTypes.object,
   // finalLoad: React.PropTypes.object,
 };
 
@@ -275,10 +275,11 @@ export default createContainer(({ params }) => {
   const initialLoad = AggLoads.findOne({initial: true});
   const initialLoadExists = !loading && !!initialLoad;
   // const finalLoad = AggLoads.find({initial: false}).fetch();
+  // console.log(finalLoad);
   // const finalLoadExists = !loading && !!finalLoad;
   return {
     loading,
-    initialLoad: initialLoadExists   ? initialLoad.l : [],
+    initialLoad: initialLoadExists   ? {n: initialLoad.n, values: initialLoad.l} : { n: 0, values: [] },
     // finalLoad:   finalLoadExists     ? { values: finalLoad.l } : { n: 0, values: [] },
   };
 }, App);

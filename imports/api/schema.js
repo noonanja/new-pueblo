@@ -3,21 +3,18 @@ Schema.publicFields = {};
 
 
 Schema.users = new SimpleSchema({
-  initial: { type: Boolean },
   hasStore: { type: Boolean },
   hasGen: { type: Boolean },
 });
 
 Schema.publicFields.Users = {
-  initial: 1,
-  hasGen: 1,
   hasStore: 1,
+  hasGen: 1,
 };
 
 
 Schema.loads = new SimpleSchema({
   userId: { type: String},
-  initial: { type: Boolean },
   l: {type: [Number], decimal: true},
   e: {type: [Number], decimal: true},
   s: {type: [Number], decimal: true, optional: true},
@@ -26,7 +23,6 @@ Schema.loads = new SimpleSchema({
 
 Schema.publicFields.Loads = {
   userId: 1,
-  initial: 1,
   l:1,
   e:1,
   s:1,
@@ -35,7 +31,7 @@ Schema.publicFields.Loads = {
 
 
 Schema.aggLoads = new SimpleSchema({
-  initial: { type: Boolean },
+  initial: {type: Boolean},
   active: {type: Boolean},
   n : {type: Number},
   l: {type: [Number], decimal: true},
