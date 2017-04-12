@@ -8,6 +8,8 @@ import { Constraints } from '/lib/constraints.js';
 
 const aggLoadDenormalizer = {
   _updateAggLoad(load, addingLoad) {
+    // if we are still building the initial aggregate load, use update on both the initial
+    // aggregate load document and the document for the final passive load
     const initialAggLoad = AggLoads.findOne({initial: true});
     let query = {active: (!!load.s || !!load.g), initial: false};
     if (!!initialAggLoad) {
@@ -56,7 +58,6 @@ const aggLoadDenormalizer = {
         this._updateAggLoad(load, false);
       });
     }
-
   },
   afterUpdateLoad(selector, modifier) {
     Loads.find(selector).forEach((load) => {

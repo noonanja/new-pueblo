@@ -17,10 +17,25 @@ export const resize = new ValidatedMethod({
   }).validator(),
   run({count, hasStore, hasGen}) {
     if (count > 0) {
-      for (i = 0; i < count; i++) {
-        Users.insert({
-          hasStore: hasStore,
-          hasGen: hasGen,
+      if (!hasStore && !hasGen) {
+        for (i = 0; i < count; i++) {
+          Users.insert({
+            hasStore: hasStore,
+            hasGen: hasGen,
+          });
+        }
+      }
+      else {
+        const toConvert = Users.find({hasStore: false, hasGen: false}, {limit: Math.abs(count)}).map(function(doc) {
+          return doc._id;
+        });
+        toConvert.forEach(function(id) {
+          Users.update(
+            {_id: id},
+            {
+              $set: {hasStore: hasStore, hasGen: hasGen}
+            }
+          );
         });
       }
     }
@@ -46,15 +61,16 @@ export const simulate = new ValidatedMethod({
     //     'Cannot edit todos in a private list that is not yours');
     // }
 
-    console.log(AggLoads.find().fetch());
+    // const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
+    // const passiveChanged = Constraints.userCount - (passiveUsers + formInput.userTypes[2]);
+    // console.log(passiveChanged);
+    // Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
+    //   if (error) {
+    //     console.log(error);
+    //   }
+    // });
 
-    const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
-    const passiveChanged = Constraints.userCount - (passiveUsers + formInput.userTypes[2]);
-    Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
-      if (error) {
-        console.log(error);
-      }
-    });
+    console.log(AggLoads.find().fetch());
 
     // insert storer-generators
     const sgCount = Users.find({hasStore: true, hasGen: true}).count();
@@ -84,6 +100,8 @@ export const simulate = new ValidatedMethod({
     });
 
     console.log(AggLoads.find().fetch());
+
+
     //
     // if (Meteor.isServer) {
     //   const cmd = "python " + "../../../../../server/.scripts/argmin.py";

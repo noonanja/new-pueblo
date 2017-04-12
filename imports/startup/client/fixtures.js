@@ -26,6 +26,5 @@ Meteor.startup(() => {
         console.log(error);
       }
     });
-
   }
 });

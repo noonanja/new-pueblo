@@ -14,13 +14,28 @@ const loadsDenormalizer = {
     const le = drawConsumption();
     // Initialize active users with no storage/ generation strategies
     const s = hasStore ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0) : null;
-    const g = hasGen ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0) : null;
+    const g = hasGen ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0): null;
     Loads.insert({
       userId: userId,
       l: le,
       e: le,
       s: s,
       g: g,
+    });
+  },
+  afterUpdateUser(selector, modifier) {
+    Users.find(selector).forEach((user) => {
+      const load = Loads.findOne({userId: user._id});
+      Loads.remove(load._id);
+      const s = user.hasStore ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0) : null;
+      const g = user.hasGen ? Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0): null;
+      Loads.insert({
+        userId: user._id,
+        l: load.e,
+        e: load.e,
+        s: s,
+        g: g,
+      });
     });
   },
   afterRemoveUser(selector) {
@@ -33,6 +48,11 @@ class UsersCollection extends Mongo.Collection {
     // Call the original `insert` method, which will validate against the schema
     const result = super.insert(user, callback);
     loadsDenormalizer.afterInsertUser(result, user.hasStore, user.hasGen);
+    return result;
+  }
+  update(selector, modifier) {
+    const result = super.update(selector, modifier);
+    loadsDenormalizer.afterUpdateUser(selector, modifier);
     return result;
   }
   remove(selector, callback) {

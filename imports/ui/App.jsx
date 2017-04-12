@@ -73,13 +73,6 @@ class App extends Component {
     });
   }
 
-  updatePassiveUsers(values) {
-    // Meteor.call('users.resizePassive', {userTypes: this.state.userTypes}, (err, res) => {
-    //   if (err) {
-    //     alert(err);
-    //   }
-    // });
-  }
 
   renderChartUsers() {
     return (
@@ -92,8 +85,7 @@ class App extends Component {
         <div className="range">
           <Range
             handle= {this.handle.bind(this)} onChange= {this.updateTipValues.bind(this)}
-            onAfterChange={this.updatePassiveUsers.bind(this)} ref= "range"
-            min={0} max={maxActive} pushable={true} marks ={marks}
+            min={0} max={maxActive} pushable={true} marks ={marks} ref= "range"
             defaultValue={Constraints.defaultUserTypes} step={Constraints.defaultStep} included={false}/>
         </div>
     )
@@ -242,11 +234,14 @@ class App extends Component {
             <div className="chart-section">
               <div className="row">
                 <h6 className="graph-header"> Aggregate Load </h6>
-                <ChartAgg initialLoad={this.props.initialLoad} />
+                <ChartAgg initialLoad={this.props.initialLoad} finalPassiveLoad={this.props.finalPassiveLoad}
+                          finalActiveLoad={this.props.finalActiveLoad} />
               </div>
               <div className="row">
                 <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
-                <ChartPrice initialValues={this.props.initialLoad.values} />
+                <ChartPrice initialValues={this.props.initialLoad.values}
+                            finalPassiveValues = {this.props.finalPassiveLoad.values}
+                            finalActiveValues  = {this.props.finalActiveLoad.values} />
               </div>
             </div>
 
@@ -266,7 +261,8 @@ class App extends Component {
 App.propTypes = {
   loading: React.PropTypes.bool,
   initialLoad: React.PropTypes.object,
-  // finalLoad: React.PropTypes.object,
+  finalPassiveLoad: React.PropTypes.object,
+  finalActiveLoad: React.PropTypes.object,
 };
 
 export default createContainer(({ params }) => {
@@ -274,12 +270,17 @@ export default createContainer(({ params }) => {
   const loading = !aggLoadsHandle.ready();
   const initialLoad = AggLoads.findOne({initial: true});
   const initialLoadExists = !loading && !!initialLoad;
-  // const finalLoad = AggLoads.find({initial: false}).fetch();
-  // console.log(finalLoad);
-  // const finalLoadExists = !loading && !!finalLoad;
+
+  const finalPassiveLoad = AggLoads.findOne({initial: false, active: false});
+  const finalPassiveLoadExists = !loading && !!finalPassiveLoad;
+
+  const finalActiveLoad = AggLoads.findOne({initial: false, active: true});
+  const finalActiveLoadExists = !loading && !!finalActiveLoad;
+
   return {
     loading,
-    initialLoad: initialLoadExists   ? {n: initialLoad.n, values: initialLoad.l} : { n: 0, values: [] },
-    // finalLoad:   finalLoadExists     ? { values: finalLoad.l } : { n: 0, values: [] },
+    initialLoad: initialLoadExists    ? {n: initialLoad.n, values: initialLoad.l} : { n: 0, values: [] },
+    finalPassiveLoad: finalPassiveLoadExists ? {n: finalPassiveLoad.n, values: finalPassiveLoad.l} : { n: 0, values: [] },
+    finalActiveLoad: finalActiveLoadExists  ? {n: finalActiveLoad.n, values: finalActiveLoad.l} : { n: 0, values: [] },
   };
 }, App);

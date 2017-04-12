@@ -13,15 +13,17 @@ export default class ChartPrice extends Component {
 
   chartPriceData() {
     const initialValues = this.props.initialValues.slice(0);
-    // const finalValues = this.props.finalValues.slice(0);
     const initialPrices = [];
-    const finalPrices = [];
     for (i = 0; i < initialValues.length; i++) {
       initialPrices.push(this.costPerKwH(initialValues[i], i+1));
     }
-    // for (i = 0; i < activeValues.length; i++) {
-    //   finalPrices.push(this.costPerKwH(passiveValues[i]+activeValues[i], i+1));
-    // }
+
+    const finalPassiveValues = this.props.finalPassiveValues.slice(0);
+    const finalActiveValues = this.props.finalActiveValues.slice(0);
+    const finalPrices = [];
+    for (i = 0; i < finalActiveValues.length; i++) {
+      finalPrices.push(this.costPerKwH(finalPassiveValues[i]+finalActiveValues[i], i+1));
+    }
     const labels = _.range(1, initialValues.length+1);
     return {
       labels: labels,
@@ -52,5 +54,6 @@ export default class ChartPrice extends Component {
 
 ChartPrice.propTypes = {
   initialValues: React.PropTypes.arrayOf(React.PropTypes.number),
-  // activeValues: React.PropTypes.arrayOf(React.PropTypes.number),
+  finalActiveValues: React.PropTypes.arrayOf(React.PropTypes.number),
+  finalPassiveValues: React.PropTypes.arrayOf(React.PropTypes.number),
 };
