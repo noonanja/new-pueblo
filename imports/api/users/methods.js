@@ -8,46 +8,25 @@ import { Console } from '../console/console.js'
 import { Constraints } from '/lib/constraints.js';
 import { Schema } from '../schema.js';
 
-export const resize = new ValidatedMethod({
-  name: 'users.resize',
+export const addActive = new ValidatedMethod({
+  name: 'users.addActive',
   validate: new SimpleSchema({
       count: {type: Number},
       hasStore: {type: Boolean},
       hasGen: {type: Boolean},
   }).validator(),
   run({count, hasStore, hasGen}) {
-    if (count > 0) {
-      if (!hasStore && !hasGen) {
-        for (i = 0; i < count; i++) {
-          Users.insert({
-            hasStore: hasStore,
-            hasGen: hasGen,
-          });
-        }
-      }
-      else {
-        const toConvert = Users.find({hasStore: false, hasGen: false}, {limit: Math.abs(count)}).map(function(doc) {
-          return doc._id;
-        });
-        toConvert.forEach(function(id) {
-          Users.update(
-            {_id: id},
-            {
-              $set: {hasStore: hasStore, hasGen: hasGen}
-            }
-          );
-        });
-      }
+    if (count < 0) {
+      throw new Meteor.Error('Can only create active users from addActive');
     }
-    else if (count < 0) {
-      const toRemove = Users.find({hasStore: hasStore, hasGen: hasGen}, {limit: Math.abs(count)}).map(function(doc) {
-        return doc._id;
-      });
-      return Users.remove({_id: {$in: toRemove}});
-    }
+    const toConvert = Users.find({hasStore: false, hasGen: false}, {limit: Math.abs(count)}).map(function(doc) {
+      return doc._id;
+    });
+    toConvert.forEach(function(id) {
+      Users.update({_id: id}, {$set: {hasStore: hasStore, hasGen: hasGen}});
+    });
   }
 });
-
 
 export const simulate = new ValidatedMethod({
   name: 'users.simulate',
@@ -61,48 +40,38 @@ export const simulate = new ValidatedMethod({
     //     'Cannot edit todos in a private list that is not yours');
     // }
 
-    // const passiveUsers = Users.find({hasStore: false, hasGen: false}).count();
-    // const passiveChanged = Constraints.userCount - (passiveUsers + formInput.userTypes[2]);
-    // console.log(passiveChanged);
-    // Meteor.call("users.resize", {count: passiveChanged, hasStore:false, hasGen:false}, (error, result) => {
-    //   if (error) {
-    //     console.log(error);
-    //   }
-    // });
-
-    console.log(AggLoads.find().fetch());
+    // reset all users to passive users
+    const passiveConvert = Users.find({ $or: [{hasStore: true}, {hasGen: true}] }).map(function(doc) {
+      return doc._id;
+    });
+    passiveConvert.forEach(function(id) {
+      Users.update({_id: id}, {$set: {hasStore: false, hasGen: false}});
+    });
 
     // insert storer-generators
-    const sgCount = Users.find({hasStore: true, hasGen: true}).count();
-    const sgChanged = formInput.userTypes[0] - sgCount;
-    Meteor.call("users.resize", {count: sgChanged, hasStore:true, hasGen:true}, (error, result) => {
+    const sgConvert = formInput.userTypes[0];
+    Meteor.call("users.addActive", {count: sgConvert, hasStore:true, hasGen:true}, (error, result) => {
       if (error) {
         console.log(error);
       }
     });
 
     // insert storers
-    const sCount = Users.find({hasStore: true, hasGen: false}).count();
-    const sChanged = (formInput.userTypes[1] - formInput.userTypes[0]) - sCount;
-    Meteor.call("users.resize", {count: sChanged, hasStore:true, hasGen:false}, (error, result) => {
+    const sConvert = (formInput.userTypes[1] - formInput.userTypes[0]);
+    Meteor.call("users.addActive", {count: sConvert, hasStore:true, hasGen:false}, (error, result) => {
       if (error) {
         console.log(error);
       }
     });
 
     // insert generators
-    const gCount = Users.find({hasStore: false, hasGen: true}).count();
-    const gChanged = (formInput.userTypes[2] - formInput.userTypes[1]) - gCount;
-    Meteor.call("users.resize", {count: gChanged, hasStore:false, hasGen:true}, (error, result) => {
+    const gConvert = (formInput.userTypes[2] - formInput.userTypes[1]);
+    Meteor.call("users.addActive", {count: gConvert, hasStore:false, hasGen:true}, (error, result) => {
       if (error) {
         console.log(error);
       }
     });
 
-    console.log(AggLoads.find().fetch());
-
-
-    //
     // if (Meteor.isServer) {
     //   const cmd = "python " + "../../../../../server/.scripts/argmin.py";
     //   passiveLoad = AggLoads.findOne({active: false});

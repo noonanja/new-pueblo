@@ -21,10 +21,11 @@ Meteor.startup(() => {
     });
 
     // Add a grid full of passive users
-    Meteor.call("users.resize", {count: Constraints.userCount, hasStore:false, hasGen:false}, (error, result) => {
-      if (error) {
-        console.log(error);
-      }
-    });
+    for (i = 0; i < Constraints.userCount; i++) {
+      Users.insert({
+        hasStore: false,
+        hasGen: false,
+      });
+    }
   }
 });

@@ -1,6 +1,5 @@
 def test():
-    print 'MEEEEE';
-    # print 'My Name is' + name;
+    print 'bridge formed';
 
 if __name__ == "__main__":
     test()
