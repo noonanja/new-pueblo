@@ -36,7 +36,6 @@ export const simulate = new ValidatedMethod({
     if (this.isSimulation) {
       // client only code
     } else {
-      const cmd = "python ../../../../../server/.scripts/argmin.py " + simId;
       Console.update(
         {_id: simId},
         {
@@ -46,7 +45,7 @@ export const simulate = new ValidatedMethod({
           }
         }
       );
-      _execSync(cmd, consoleInsert, consoleInsert);
+      _execSync(simId, consoleInsert, consoleInsert);
     }
 
   },
@@ -86,10 +85,15 @@ export const simulate = new ValidatedMethod({
 //   // }
 // }
 
-const consoleInsert = function(_data) {
-  Console.insert({
-    name: 'python response',
-    timestamp : new Date().getTime(),
-    data : _data
-  });
+const consoleInsert = function(_data, simId) {
+  console.log(simId);
+  Console.update(
+    {_id: simId},
+    {
+      $set: {
+        activeAggLoad: [69,69,69],
+        // activeLoads: activeLoads,
+      }
+    }
+  );
 };
