@@ -8,6 +8,7 @@ import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 import { Users }    from '../api/users/users.js';
 import { AggLoads } from '../api/aggLoads/aggLoads.js';
+import { Loads } from '../api/loads/loads.js';
 
 import ChartUsers from './ChartUsers.jsx';
 import ChartAgg from './ChartAgg.jsx';
@@ -174,14 +175,24 @@ class App extends Component {
     Meteor.call('users.partition', {userTypes: this.state.userTypes});
 
     const passiveLoad = this.props.finalPassiveLoad;
-    Meteor.call('console.simulate', {formInput: this.state, passiveLoadValues: passiveLoad.values}, (err, res) => {
+    Meteor.call('console.setSim', {formInput: this.state, passiveLoadValues: passiveLoad.values}, (err, res) => {
       if (err) {
         alert(err);
       }
       if (res) {
-        console.log(res);
+        let countdown = 1;
+        while (countdown > 0) {
+          Meteor.call('console.simulate',
+          {
+            simId: res,
+            activeAggLoad: this.props.finalActiveLoad.values,
+            activeLoads: this.props.activeLoads,
+          });
+          countdown -= 1;
+        }
       }
     });
+
 
     // const cmd = "python " + "../../../../../server/.scripts/argmin.py " + id;
     // let x_prime = _execSync(cmd, consoleInsert, consoleInsert);
@@ -304,6 +315,7 @@ App.propTypes = {
   initialLoad: React.PropTypes.object,
   finalPassiveLoad: React.PropTypes.object,
   finalActiveLoad: React.PropTypes.object,
+  activeLoads: PropTypes.arrayOf(React.PropTypes.object),
 };
 
 export default createContainer(({ params }) => {
@@ -318,10 +330,16 @@ export default createContainer(({ params }) => {
   const finalActiveLoad = AggLoads.findOne({initial: false, active: true});
   const finalActiveLoadExists = !loading && !!finalActiveLoad;
 
+  const activeUserIds = Users.find({ $or: [{hasStore: true}, {hasGen: true}] }).map(function(doc) {
+    return doc._id;
+  });
+  const activeLoads = Loads.find({userId: {$in: activeUserIds}}).fetch();
+
   return {
     loading,
     initialLoad: initialLoadExists    ? {n: initialLoad.n, values: initialLoad.l} : { n: 0, values: [] },
     finalPassiveLoad: finalPassiveLoadExists ? {n: finalPassiveLoad.n, values: finalPassiveLoad.l} : { n: 0, values: [] },
     finalActiveLoad: finalActiveLoadExists  ? {n: finalActiveLoad.n, values: finalActiveLoad.l} : { n: 0, values: [] },
+    activeLoads: activeLoads,
   };
 }, App);

@@ -1,31 +1,54 @@
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
+
+import { Users } from '../users/users.js';
+import { Loads } from '../loads/loads.js';
 import { Console } from './console.js';
 
 import { Schema } from '../schema.js';
 
 
-export const simulate = new ValidatedMethod({
-  name: 'console.simulate',
+export const setSim = new ValidatedMethod({
+  name: 'console.setSim',
   validate: new SimpleSchema({
     formInput: {type: Schema.formInput},
     passiveLoadValues: {type: [Number], decimal: true},
   }).validator(),
   run({formInput, passiveLoadValues}) {
-    const id = Console.insert({
+    return Console.insert({
       name: 'sim',
       timestamp: new Date().getTime(),
       requirements: formInput,
       passiveLoadValues: passiveLoadValues,
-      strategies: {},
+      activeAggLoad: null,
+      activeLoads: null,
     });
-    const cmd = "python " + "../../../../../server/.scripts/argmin.py " + id;
+  },
+});
+
+export const simulate = new ValidatedMethod({
+  name: 'console.simulate',
+  validate: new SimpleSchema({
+    simId: { type: String, regEx: SimpleSchema.RegEx.Id },
+    activeAggLoad: {type: [Number], decimal: true},
+    activeLoads: {type: [Schema.loads]},
+  }).validator(),
+  run({simId, activeAggLoad, activeLoads}) {
     if (this.isSimulation) {
-        // Simulation code for the client (optional)
+      // client only code
+    } else {
+      const cmd = "python ../../../../../server/.scripts/argmin.py " + simId;
+      Console.update(
+        {_id: simId},
+        {
+          $set: {
+            activeAggLoad: activeAggLoad,
+            activeLoads: activeLoads,
+          }
+        }
+      );
+      _execSync(cmd, consoleInsert, consoleInsert);
     }
-    else {
-      let x_prime = _execSync(cmd, consoleInsert, consoleInsert);
-      return x_prime;
-    }
+
   },
 });
 
