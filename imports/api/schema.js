@@ -16,15 +16,19 @@ Schema.publicFields.Users = {
 
 Schema.loads = new SimpleSchema({
   _id: { type: String, regEx: SimpleSchema.RegEx.Id },
-  userId: { type: String},
+  userId: { type: String },
+  hasStore: { type: Boolean },
+  hasGen: { type: Boolean },
   l: {type: [Number], decimal: true},
   e: {type: [Number], decimal: true},
-  s: {type: [Number], decimal: true, optional: true},
-  g: {type: [Number], decimal: true, optional: true},
+  s: {type: [Number], decimal: true},
+  g: {type: [Number], decimal: true},
 });
 
 Schema.publicFields.Loads = {
   userId: 1,
+  hasStore: 1,
+  hasGen: 1,
   l:1,
   e:1,
   s:1,
@@ -40,8 +44,8 @@ Schema.aggLoads = new SimpleSchema({
 });
 
 Schema.publicFields.AggLoads = {
-  initial: 1,
   active: 1,
+  initial: 1,
   n:1,
   l:1,
 };
@@ -64,7 +68,8 @@ Schema.Console = new SimpleSchema({
   requirements: {type: Schema.formInput},
   passiveLoadValues: {type: [Number]},
   activeAggLoad: {type: [Number]},
-  activeLoads: {type: [Schema.loads]},  
+  activeLoads: {type: [Schema.loads]},
+  error: {type: String, optional: true}
 });
 
 Schema.publicFields.Console = {
@@ -73,5 +78,7 @@ Schema.publicFields.Console = {
   timestamp: 1,
   requirements: 1,
   passiveLoadValues: 1,
-  strategies: 1,
+  activeAggLoad: 1,
+  activeLoads: 1,
+  error: 1,
 };

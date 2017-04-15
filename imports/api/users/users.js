@@ -15,7 +15,7 @@ class UsersCollection extends Mongo.Collection {
     return result;
   }
   update(selector, modifier) {
-    denormalizers.beforeUpdateUsers(selector, modifier);
+    // denormalizers.beforeUpdateUsers(selector, modifier);
     const result = super.update(selector, modifier);
     denormalizers.afterUpdateUsers(selector);
     return result;

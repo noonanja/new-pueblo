@@ -45,54 +45,30 @@ export const simulate = new ValidatedMethod({
           }
         }
       );
-      _execSync(simId, consoleInsert, consoleInsert);
+      _execSync(simId, consoleUpdateLoads, consoleErr);
     }
 
   },
 });
 
-// if (Meteor.isServer) {
-//
-//   const cmd = "python " + "../../../../../server/.scripts/argmin.py " + id;
-//   let x_prime = _execSync(cmd, consoleInsert, consoleInsert);
-//   // let countdown = 5;
-//   // while (countdown > 1) {
-//     // activeLoad = AggLoads.findOne({active: true});
-//     // Users.find({active: true}).forEach(function(user) {
-//     //       //////////////////////////////////////////////////////
-//     //   // Given Aggregate Load and the constraints from the form input,
-//     //   // minimize the user's cost objective function
-//     //     //////////////////////////////////////////////////////
-//     //   load = Loads.find({userId: user._id});
-//     //   let otherActiveAgg = Math.subtract(activeLoad, load.l);
-//     //
-//     //   let s_prime = _execSync(cmd, consoleInsert, consoleInsert);
-//     //   let s = s_prime['s'];
-//     //   let g = s_prime['g'];
-//     //
-//     //   // If the NE has been reached, each user updates their strategy "centroid"
-//     //   Loads.update({userId: user._id},
-//     //                {
-//     //                  $set : {
-//     //                    l: Math.add(load.e, Math.subtract(s, g)),
-//     //                    s: s,
-//     //                    g: g,
-//     //                  }
-//     //                }
-//     //   );
-//     // });
-//     // countdown -= 1;
-//   // }
-// }
-
-const consoleInsert = function(_data, simId) {
-  console.log(simId);
+const consoleUpdateLoads = function(_data, simId) {
   Console.update(
     {_id: simId},
     {
       $set: {
         activeAggLoad: [69,69,69],
         // activeLoads: activeLoads,
+      }
+    }
+  );
+};
+
+const consoleErr = function(_data, simId) {
+  Console.update(
+    {_id: simId},
+    {
+      $set: {
+        error: _data,
       }
     }
   );

@@ -330,10 +330,7 @@ export default createContainer(({ params }) => {
   const finalActiveLoad = AggLoads.findOne({initial: false, active: true});
   const finalActiveLoadExists = !loading && !!finalActiveLoad;
 
-  const activeUserIds = Users.find({ $or: [{hasStore: true}, {hasGen: true}] }).map(function(doc) {
-    return doc._id;
-  });
-  const activeLoads = Loads.find({userId: {$in: activeUserIds}}).fetch();
+  const activeLoads = Loads.find({ $or: [{hasStore: true}, {hasGen: true}] }).fetch();
 
   return {
     loading,

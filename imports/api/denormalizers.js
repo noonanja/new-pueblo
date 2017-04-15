@@ -14,16 +14,15 @@ export const denormalizers = {
     // if we are still building the initial aggregate load, use update on both the initial
     // aggregate load document and the final passive load document
     const initialAggLoad = AggLoads.findOne({initial: true});
-    const user = Users.findOne(load.userId);
-    let query = {active: (user.hasStore || user.hasGen), initial: false};
+    let selector = {active: (load.hasStore || load.hasGen), initial: false};
     if (!!initialAggLoad) {
       if (initialAggLoad.n < Constraints.userCount) {
-        query = {active: (user.hasStore || user.hasGen)};
+        selector = {active: (load.hasStore || load.hasGen)};
       }
     }
     const c = addingLoad ? 1 : -1;
     AggLoads.update(
-      query,
+      selector,
       {
         $inc: {
             n: c,
@@ -36,7 +35,7 @@ export const denormalizers = {
             "l.21": c*load.l[21], "l.22": c*load.l[22], "l.23": c*load.l[23],
         },
         $setOnInsert: {
-            active: (user.hasStore || user.hasGen),
+            active: (load.hasStore || load.hasGen),
             n: 1,
             l: load.l,
         },
@@ -61,25 +60,23 @@ export const denormalizers = {
     const g = Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0);
     Loads.insert({
       userId: userId,
+      hasStore: hasStore,
+      hasGen: hasGen,
       l: le,
       e: le,
       s: s,
       g: g,
     });
   },
-  beforeUpdateUsers(selector, modifier) {
-    // We only support very limited operations directly on users and loads
-    check(modifier, { $set: Object });
-    const ids = Users.find(selector).map(function(user) {
-      return user._id;
-    });
-    this._loadUpdateHelper({userId: {$in: ids}}, false);
-  },
   afterUpdateUsers(selector, modifier) {
-    const ids = Users.find(selector).map(function(user) {
-      return user._id;
+    Users.find(selector).map(function(user) {
+      Loads.update(
+        { userId: user._id },
+        {
+          $set: {hasStore: user.hasStore, hasGen: user.hasGen }
+        }
+      );
     });
-    this._loadUpdateHelper({userId: {$in: ids}}, true);
   },
   afterRemoveUsers(selector) {
     Users.find(selector).forEach((user) => {

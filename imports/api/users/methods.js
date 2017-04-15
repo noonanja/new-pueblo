@@ -16,12 +16,13 @@ export const partition = new ValidatedMethod({
   }).validator(),
   run({userTypes}) {
     // reset all users to passive users
-    const passiveConvert = Users.find({ $or: [{hasStore: true}, {hasGen: true}] }).map(function(doc) {
-      return doc._id;
-    });
-    passiveConvert.forEach(function(id) {
-      Users.update({_id: id}, {$set: {hasStore: false, hasGen: false}});
-    });
+    Users.update(
+      { $or: [{hasStore: true}, {hasGen: true}] },
+      {
+        $set: {hasStore: false, hasGen: false},
+      },
+      { multi: true }
+    );
 
     // insert storer-generators
     const sgConvert = userTypes[0];
