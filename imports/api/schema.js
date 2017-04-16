@@ -51,14 +51,14 @@ Schema.publicFields.AggLoads = {
 };
 
 Schema.formInput = new SimpleSchema({
-  userTypes: {type: [Number]},
-  cEfficiency: {type: Number},
-  dEfficiency: {type: Number},
-  capacity: {type: Number},
-  maxChargeRate: {type: Number},
-  leakRate: {type: Number},
-  maxHourlyProduction: {type: Number},
-  maxDailyProduction: {type: Number},
+  userTypes: {type: [Number], decimal: true},
+  cEfficiency: {type: Number, decimal: true},
+  dEfficiency: {type: Number, decimal: true},
+  capacity: {type: Number, decimal: true},
+  maxChargeRate: {type: Number, decimal: true},
+  leakRate: {type: Number, decimal: true},
+  maxHourlyProduction: {type: Number, decimal: true},
+  maxDailyProduction: {type: Number, decimal: true},
 });
 
 Schema.Console = new SimpleSchema({

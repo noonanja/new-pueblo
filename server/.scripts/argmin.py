@@ -72,14 +72,15 @@ class Simulation(object):
         self.activeLoads = activeLoads;
 
     def simulate(self):
-        for load in self.activeLoads:
-            otherActiveAgg = np.subtract(self.activeAggLoad, load['l'])
-            otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
-            if (load['hasStore'] and not load['hasGen']):
-                s = self.storer_minimize(otherAgg)
-                print s
+        load = self.activeLoads[4]
+        # for load in self.activeLoads:
+        otherActiveAgg = np.subtract(self.activeAggLoad, load['l'])
+        otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
+        if (load['hasStore'] and not load['hasGen']):
+            s = self.storer_minimize(load['e'], otherAgg)
+            print s
 
-    def storer_minimize(self, otherAgg):
+    def storer_minimize(self, e, otherAgg):
         """
         Objective function: argmin ~s~ { f(otherAgg) }
                             where f(otherAgg) =
@@ -92,17 +93,46 @@ class Simulation(object):
         """
         P = np.zeros((48,48))
         h = 1
-        print self.cEF
-        for i in xrange(0, len(P) - 2, 2):
-            P[i][i+i] = gridK[h] * self.cEF * self.cEF
-            P[i][i+i+1]= -gridK[h] * self.cEF * self.dEF
-            P[i+1][i+i] = -gridK[h] * self.cEF * self.dEF
-            P[i+1][i+i+1] = gridK[h] * self.dEF * self.dEF
+        for i in xrange(0, len(P) - 1, 2):
+            P[i][i] = gridK[h] * self.cEF * self.cEF
+            P[i][i+1]= -gridK[h] * self.cEF * self.dEF
+            P[i+1][i] = -gridK[h] * self.cEF * self.dEF
+            P[i+1][i+1] = gridK[h] * self.dEF * self.dEF
             h += 1
-
-        print P
         # P = matrix()
-        # q = matrix()
+        q = []
+        h = 1 # prices are indexed from 1
+        for i in xrange(0, 47, 2):
+            q.append( 2*self.cEF*e[h-1]*gridK[h] + gridK[h]*otherAgg[h-1]*self.cEF)
+            q.append(-2*self.dEF*e[h-1]*gridK[h] + gridK[h]*otherAgg[h-1]*self.dEF)
+            h += 1
+        # q = matrix(2 * q)
+
+        G = np.zeros((122, 48))
+        j = 0
+        for i in xrange(0, 24):
+            G[i][j] = self.cEF
+            G[i][j+1] = self.dEF
+            j+=2
+        for i in xrange(0, 24):
+            for j in xrange(0, (2*(i+1)), 2):
+                # charge limit
+                G[i+24][j]   =  (self.lR**((i)-j/2))*self.cEF
+                G[i+24][j+1] = -(self.lR**((i)-j/2))*self.dEF
+                # discharge limit
+                G[i+48][j]   =  (self.lR**((i)-j/2))*self.dEF
+                G[i+48][j+1] = -(self.lR**((i)-j/2))*self.cEF
+        for j in xrange(0, 48, 2):
+            # final charge equals initial charge
+            G[72][j]   =  (self.lR**(23-j/2))*self.cEF
+            G[72][j+1] = -(self.lR**(23-j/2))*self.dEF
+            # final charge equals initial charge
+            G[73][j]   =  (self.lR**(23-j/2))*self.dEF
+            G[73][j+1] = -(self.lR**(23-j/2))*self.cEF
+
+        print G[47]
+        print G[72]
+            # G[i] = np.array([])
         # G = matrix()
         # h = matrix()
         #
@@ -114,7 +144,7 @@ def main(args):
     passiveLoadValues = sim['passiveLoadValues']
     activeAggLoad = sim['activeAggLoad']
     activeLoads = sim['activeLoads']
-
+    requirements = sim['requirements']
     simulation = Simulation(float(requirements['cEfficiency']) / 100,
                             float(requirements['dEfficiency']) / 100,
                             float(requirements['capacity']),
@@ -130,5 +160,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(["blank", "qABTnkoPMYpEaLYHC"])
+    main(["blank", "nyxLNXycgos47koD8"])
     # main(sys.argv)
