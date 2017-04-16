@@ -60,19 +60,34 @@ class Simulation(object):
                 s: net storage per time slot (= amount charged - amount discharged)
                 g: generation per time slot
         """
-        self.cEF = cEF;
-        self.dEF = dEF;
-        self.c = c;
-        self.mCR = mCR;
-        self.lR = lR;
-        self.mHP = mHP;
-        self.mDP = mDP;
-        self.passiveLoadValues = passiveLoadValues;
-        self.activeAggLoad = activeAggLoad;
-        self.activeLoads = activeLoads;
+        self.cEF = cEF
+        self.dEF = dEF
+        self.c = c
+        self.mCR = mCR
+        self.lR = lR
+        self.mHP = mHP
+        self.mDP = mDP
+        self.passiveLoadValues = passiveLoadValues
+        self.activeAggLoad = activeAggLoad
+        self.activeLoads = activeLoads
 
-        self.qZero = .25*c;
-        self.epsilon = 0.0;
+        self.qZero = .25*c
+        self.epsilon = 0.0
+
+        print "self.cEF" , self.cEF 
+        print "self.dEF" , self.dEF 
+        print "self.c" , self.c 
+        print "self.mCR" , self.mCR 
+        print "self.lR" , self.lR 
+        print "self.mHP" , self.mHP 
+        print "self.mDP" , self.mDP 
+        print "self.passiveLoadValues" , self.passiveLoadValues 
+        print "self.activeAggLoad" , self.activeAggLoad 
+        print "self.activeLoads" , self.activeLoads 
+        print "self.qZero" , self.qZero 
+        print "self.epsilon" , self.epsilon 
+
+
 
         """
             Create portion of objective function, a matrix P, and constraint matrices
@@ -163,6 +178,7 @@ class Simulation(object):
         otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
         if (load['hasStore'] and not load['hasGen']):
             s = self.storer_minimize(load['e'], otherAgg)
+            print "load minimized"
             print load['userId']
             print load['hasStore']
             print load['hasGen']
@@ -190,5 +206,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(["blank", "nyxLNXycgos47koD8"])
+    main(["blank", "2XQfPhwtkBptbW8Wc"])
     # main(sys.argv)

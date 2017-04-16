@@ -97,38 +97,38 @@ class App extends Component {
         <div className="row">
           <label className="one-half column energyStorage">
             <p>Charge Efficiency</p>
-            <input type="number" step="10" value={this.state.cEfficiency} required
-            min={50} max={100}
+            <input type="number" step={2.0} value={this.state.cEfficiency} required
+            min={80.0} max={100.0}
             name= "cEfficiency" onChange={this.handleChange} /> %
           </label>
 
           <label className="one-half column energyStorage">
             <p>Discharging Efficiency</p>
-            <input type="number" step="10" value={this.state.dEfficiency} required
-            min={100} max={200}
+            <input type="number" step={2.0} value={this.state.dEfficiency} required
+            min={100.0} max={120.0}
             name= "dEfficiency" onChange={this.handleChange} /> %
           </label>
         </div>
         <div className="row">
           <label className="one-half column energyStorage">
             <p>Capacity</p>
-            <input type="number" step="1" value={this.state.capacity} required
-            min={1} max={Constraints.defaultCapacity+10}
+            <input type="number" step={1.0} value={this.state.capacity} required
+            min={1.0} max={Constraints.defaultCapacity+10}
             name= "capacity" onChange={this.handleChange} /> kWh
           </label>
 
           <label className="one-half column energyStorage">
             <p>Max Charge Rate</p>
-            <input type="number" step=".2" value={this.state.maxChargeRate} required
-            min={.1} max={2}
+            <input type="number" step={0.2} value={this.state.maxChargeRate} required
+            min={0.1} max={2.0}
             name= "maxChargeRate" onChange={this.handleChange} /> kWh / h
           </label>
         </div>
         <div className="row">
           <label className="energyStorage">
             <p>Leakage Rate</p>
-            <input type="number" step="5" value={this.state.leakRate} required
-            min={0} max={50}
+            <input type="number" step={0.1} value={this.state.leakRate} required
+            min={99.0} max={100.0}
             name= "leakRate" onChange={this.handleChange} /> %
           </label>
         </div>
@@ -161,7 +161,7 @@ class App extends Component {
 
   handleChange(event) {
     const target = event.target;
-    const value = parseInt(target.value);
+    const value = parseFloat(target.value);
     const name = target.name;
     this.setState({[name]: value});
   }
