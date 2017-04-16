@@ -74,21 +74,6 @@ class Simulation(object):
         self.qZero = .25*c
         self.epsilon = 0.0
 
-        print "self.cEF" , self.cEF 
-        print "self.dEF" , self.dEF 
-        print "self.c" , self.c 
-        print "self.mCR" , self.mCR 
-        print "self.lR" , self.lR 
-        print "self.mHP" , self.mHP 
-        print "self.mDP" , self.mDP 
-        print "self.passiveLoadValues" , self.passiveLoadValues 
-        print "self.activeAggLoad" , self.activeAggLoad 
-        print "self.activeLoads" , self.activeLoads 
-        print "self.qZero" , self.qZero 
-        print "self.epsilon" , self.epsilon 
-
-
-
         """
             Create portion of objective function, a matrix P, and constraint matrices
             G and h, which all will be shared for each user
@@ -96,10 +81,10 @@ class Simulation(object):
         self.P = np.zeros((48,48))
         hour = 1
         for i in xrange(0, len(self.P) - 1, 2):
-            self.P[i][i]     =  gridK[hour] * self.cEF * self.cEF
-            self.P[i][i+1]   = -gridK[hour] * self.cEF * self.dEF
-            self.P[i+1][i]   = -gridK[hour] * self.cEF * self.dEF
-            self.P[i+1][i+1] =  gridK[hour] * self.dEF * self.dEF
+            self.P[i][i]     =  gridK[hour]
+            self.P[i][i+1]   = -gridK[hour]
+            self.P[i+1][i]   = -gridK[hour]
+            self.P[i+1][i+1] =  gridK[hour]
             hour += 1
         self.P = 2*self.P
 
@@ -164,8 +149,8 @@ class Simulation(object):
         q = []
         hour = 1 # prices are indexed from 1
         for i in xrange(0, 47, 2):
-            q.append( 2*self.cEF*e[hour-1]*gridK[hour] + gridK[hour]*otherAgg[hour-1]*self.cEF)
-            q.append(-2*self.dEF*e[hour-1]*gridK[hour] + gridK[hour]*otherAgg[hour-1]*self.dEF)
+            q.append( 2*e[hour-1]*gridK[hour] + gridK[hour]*otherAgg[hour-1])
+            q.append(-2*e[hour-1]*gridK[hour] - gridK[hour]*otherAgg[hour-1])
             hour += 1
         q = np.array(q)
 
