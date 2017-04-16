@@ -37,7 +37,6 @@ class App extends Component {
 
     this.state = {
       userTypes: Constraints.defaultUserTypes,
-      requirements: Constraints.defaultRequirements,
       cEfficiency: Constraints.defaultCEfficiency,
       dEfficiency: Constraints.defaultDEfficiency,
       capacity: Constraints.defaultCapacity,
@@ -98,38 +97,38 @@ class App extends Component {
         <div className="row">
           <label className="one-half column energyStorage">
             <p>Charge Efficiency</p>
-            <input type="number" step="2" value={this.state.cEfficiency} required
-            min={Constraints.defaultCEfficiency-4} max={Constraints.defaultCEfficiency+4}
+            <input type="number" step="10" value={this.state.cEfficiency} required
+            min={50} max={100}
             name= "cEfficiency" onChange={this.handleChange} /> %
           </label>
 
           <label className="one-half column energyStorage">
             <p>Discharging Efficiency</p>
-            <input type="number" step="2" value={this.state.dEfficiency} required
-            min={Constraints.defaultDEfficiency-4} max={Constraints.defaultDEfficiency+4}
+            <input type="number" step="10" value={this.state.dEfficiency} required
+            min={100} max={200}
             name= "dEfficiency" onChange={this.handleChange} /> %
           </label>
         </div>
         <div className="row">
           <label className="one-half column energyStorage">
             <p>Capacity</p>
-            <input type="number" step="2" value={this.state.capacity} required
-            min={Constraints.defaultCapacity-4} max={Constraints.defaultCapacity+4}
+            <input type="number" step="1" value={this.state.capacity} required
+            min={1} max={Constraints.defaultCapacity+10}
             name= "capacity" onChange={this.handleChange} /> kWh
           </label>
 
           <label className="one-half column energyStorage">
             <p>Max Charge Rate</p>
-            <input type="number" step="2" value={this.state.maxChargeRate} required
-            min={Constraints.defaultMaxChargeRate-4} max={Constraints.defaultMaxChargeRate+4}
-            name= "maxChargeRate" onChange={this.handleChange} /> kWh per hour
+            <input type="number" step=".2" value={this.state.maxChargeRate} required
+            min={.1} max={2}
+            name= "maxChargeRate" onChange={this.handleChange} /> kWh / h
           </label>
         </div>
         <div className="row">
           <label className="energyStorage">
             <p>Leakage Rate</p>
-            <input type="number" step="2" value={this.state.leakRate} required
-            min={Constraints.defaultLeakRate-4} max={Constraints.defaultLeakRate+4}
+            <input type="number" step="5" value={this.state.leakRate} required
+            min={0} max={50}
             name= "leakRate" onChange={this.handleChange} /> %
           </label>
         </div>

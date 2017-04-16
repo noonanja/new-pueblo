@@ -16,7 +16,7 @@ with open(os.path.join(os.path.split(os.path.realpath(__file__))[0],
                        'gridK.yaml'), 'r') as f:
     params_raw = f.read()
 params = yaml.load(params_raw)
-gridK = np.array(params['gridK'])
+gridK = params['gridK']
 
 client = MongoClient('mongodb://127.0.0.1:3001/meteor')
 db = client.meteor
@@ -27,7 +27,8 @@ class Simulation(object):
     constraints set by client. Each active user sets their optimal
     strategy given the aggregate loads in the current iteration
     """
-    def __init__(cEF,
+    def __init__(self,
+                cEF,
                  dEF,
                  c,
                  mCR,
@@ -45,7 +46,7 @@ class Simulation(object):
             dEF - discharging efficiency, dEF >= 1
             c   - capacity,
             mCR - max energy stored in a time slot,
-            lR  – leakage rate, 0 < lR <= 1,
+            lR  - leakage rate, 0 < lR <= 1,
           Production Model (constants for each user):
             mHP - max hourly production, 0 <= g(h) <= mHP,
             mDP - max daily production, sum[g(h)] <= mDP
@@ -75,7 +76,7 @@ class Simulation(object):
             otherActiveAgg = np.subtract(self.activeAggLoad, load['l'])
             otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
             if (load['hasStore'] and not load['hasGen']):
-                s = storer_minimize(otherAgg)
+                s = self.storer_minimize(otherAgg)
                 print s
 
     def storer_minimize(self, otherAgg):
@@ -89,29 +90,38 @@ class Simulation(object):
         We will use the standard form of a Quadratic Programming problem below, defined
         here: courses.csail.mit.edu/6.867/wiki/images/a/a7/Qp-cvxopt.pdf
         """
-        
-        P = matrix()
-        q = matrix()
-        G = matrix()
-        h = matrix()
+        P = np.zeros((48,48))
+        h = 1
+        print self.cEF
+        for i in xrange(0, len(P) - 2, 2):
+            P[i][i+i] = gridK[h] * self.cEF * self.cEF
+            P[i][i+i+1]= -gridK[h] * self.cEF * self.dEF
+            P[i+1][i+i] = -gridK[h] * self.cEF * self.dEF
+            P[i+1][i+i+1] = gridK[h] * self.dEF * self.dEF
+            h += 1
 
-        sol = solvers.qp(P, q, G, h)
+        print P
+        # P = matrix()
+        # q = matrix()
+        # G = matrix()
+        # h = matrix()
+        #
+        # sol = solvers.qp(P, q, G, h)
 
 
 def main(args):
     sim = db.console.find_one(args[1])
-    requirements = sim['requirements']
     passiveLoadValues = sim['passiveLoadValues']
     activeAggLoad = sim['activeAggLoad']
     activeLoads = sim['activeLoads']
 
-    simulation = Simulation(requirements['cEfficiency'],
-                            requirements['dEfficiency'],
-                            requirements['capacity'],
-                            requirements['maxChargeRate'],
-                            requirements['leakRate'],
-                            requirements['maxHourlyProduction'],
-                            requirements['maxDailyProduction'],
+    simulation = Simulation(float(requirements['cEfficiency']) / 100,
+                            float(requirements['dEfficiency']) / 100,
+                            float(requirements['capacity']),
+                            float(requirements['maxChargeRate']),
+                            float(requirements['leakRate']) / 100,
+                            float(requirements['maxHourlyProduction']),
+                            float(requirements['maxDailyProduction']),
                             passiveLoadValues,
                             activeAggLoad,
                             activeLoads

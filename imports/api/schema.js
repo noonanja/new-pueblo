@@ -52,7 +52,6 @@ Schema.publicFields.AggLoads = {
 
 Schema.formInput = new SimpleSchema({
   userTypes: {type: [Number]},
-  requirements: {type: Number},
   cEfficiency: {type: Number},
   dEfficiency: {type: Number},
   capacity: {type: Number},
