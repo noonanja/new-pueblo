@@ -98,9 +98,9 @@ class Simulation(object):
         j = 0
         for i in xrange(0, 24):
             # (amount charged * cEF) - (amount discharged * dEF) <= mCR
-            self.h[i]      = self.mCR
-            self.G[i][j]   = self.cEF
-            self.G[i][j+1] = self.dEF
+            self.h[i]      =  self.mCR
+            self.G[i][j]   =  self.cEF
+            self.G[i][j+1] = -self.dEF
             j+=2
 
 
