@@ -4,6 +4,7 @@ from pymongo import MongoClient
 import sys
 
 import numpy as np
+np.set_printoptions(threshold=np.nan)
 
 import yaml
 import os
@@ -28,6 +29,7 @@ class Simulation(object):
     strategy given the aggregate loads in the current iteration
     """
     def __init__(self,
+                 userTypes,
                  cEF,
                  dEF,
                  c,
@@ -71,20 +73,24 @@ class Simulation(object):
         self.activeAggLoad = activeAggLoad
         self.activeLoads = activeLoads
 
-        self.qZero = .25*c
-        self.epsilon = 0.0
+        self.qZero   = .25*c
+        self.epsilon = 0.00 # note: 0 in paper
+
+        self.tau  = 3*(userTypes[2] - 1)*max([k for k in gridK]) + 1 # tau > 3*(N - 1)*max(gridPrice)
+        self.sBar = np.zeros((48))
+        # Centroid is [sPos1, sNeg1, sPos2, sNeg2,...sPos24, sNeg24]T
 
         """
-            Create portion of objective function, a matrix P, and constraint matrices
+            Create portions of the objective function, a matrix P, and constraint matrices
             G and h, which all will be shared for each user
         """
         self.P = np.zeros((48,48))
         hour = 1
         for i in xrange(0, len(self.P) - 1, 2):
-            self.P[i][i]     =  gridK[hour]
-            self.P[i][i+1]   = -gridK[hour]
-            self.P[i+1][i]   = -gridK[hour]
-            self.P[i+1][i+1] =  gridK[hour]
+            self.P[i][i]    =  gridK[hour] + self.tau
+            self.P[i][i+1]  = -gridK[hour]
+            self.P[i+1][i]  = -gridK[hour]
+            self.P[i+1][i+1]=  gridK[hour] + self.tau
             hour += 1
         self.P = 2*self.P
 
@@ -96,14 +102,12 @@ class Simulation(object):
 
         # hourly charge limit
         j = 0
-        print "self.cEF", self.cEF
         for i in xrange(0, 24):
             # (amount charged * cEF) - (amount discharged * dEF) <= mCR
             self.h[i]      =  self.mCR
             self.G[i][j]   =  self.cEF
             self.G[i][j+1] = -self.dEF
             j+=2
-
 
         # daily charge and discharge limits
         for i in xrange(0, 24):
@@ -141,56 +145,59 @@ class Simulation(object):
         Objective function: argmin ~s~ { f(otherAgg) }
                             where f(otherAgg) =
                                 sum_(h=1)^24 [
-                                    gridK(h) * (otherAgg + e(h) + s(h)) * (e(h) + s(h))
+                                    gridK(h) * ( otherAgg + e(h) + s(h) ) * ( e(h) + s(h) )
                                 ]
         Constraints on s: defined in paper
         We will use the standard form of a Quadratic Programming problem below, defined
         here: courses.csail.mit.edu/6.867/wiki/images/a/a7/Qp-cvxopt.pdf
         """
         q = []
-        hour = 1 # prices are indexed from 1
-        for i in xrange(0, 47, 2):
-            q.append( 2*e[hour-1]*gridK[hour] + gridK[hour]*otherAgg[hour-1])
-            q.append(-2*e[hour-1]*gridK[hour] - gridK[hour]*otherAgg[hour-1])
-            hour += 1
+        for i in xrange(0, 47, 2): # grid prices are indexed from 1
+            q.append( 2*e[i/2]*gridK[i/2+1] + gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*self.sBar[i])
+            q.append(-2*e[i/2]*gridK[i/2+1] - gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*self.sBar[i+1])
         q = np.array(q)
+
+        print "matrix P", self.P
+        print "matrix q", q
 
         return solvers.qp(matrix(self.P), matrix(q), matrix(self.G), matrix(self.h))['x']
 
     def simulate(self):
-        load = self.activeLoads[4]
-        # for load in self.activeLoads:
-        otherActiveAgg = np.subtract(self.activeAggLoad, load['l'])
-        otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
-        if (load['hasStore'] and not load['hasGen']):
-            s = self.storer_minimize(load['e'], otherAgg)
-            print "load minimized"
-            print load['userId']
-            print load['hasStore']
-            print load['hasGen']
-            print s
+        # load = self.activeLoads[4]
+        for load in self.activeLoads:
+            otherActiveAgg = np.subtract(self.activeAggLoad, load['l'])
+            otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
+            if (load['hasStore'] and not load['hasGen']):
+                s = self.storer_minimize(load['e'], otherAgg)
+                print load['userId']
+                print load['hasStore']
+                print load['hasGen']
+                print "charged", sum([s[i] for i in xrange(0, len(s), 2)])
+                print "discharged", sum([s[i] for i in xrange(1, len(s)-1, 2)])
+                print s
+                sys.stdout.flush()
 
 
 def main(args):
     sim = db.console.find_one(args[1])
-    passiveLoadValues = sim['passiveLoadValues']
-    activeAggLoad = sim['activeAggLoad']
-    activeLoads = sim['activeLoads']
     requirements = sim['requirements']
-    simulation = Simulation(float(requirements['cEfficiency']) / 100,
+    simulation = Simulation(requirements['userTypes'],
+                            float(requirements['cEfficiency']) / 100,
                             float(requirements['dEfficiency']) / 100,
                             float(requirements['capacity']),
                             float(requirements['maxChargeRate']),
                             float(requirements['leakRate']) / 100,
+
                             float(requirements['maxHourlyProduction']),
                             float(requirements['maxDailyProduction']),
-                            passiveLoadValues,
-                            activeAggLoad,
-                            activeLoads
+
+                            sim['passiveLoadValues'],
+                            sim['activeAggLoad'],
+                            sim['activeLoads']
                             )
     simulation.simulate()
 
 
 if __name__ == "__main__":
-    main(["blank", "2XQfPhwtkBptbW8Wc"])
     # main(sys.argv)
+    main(["blank", "EfnidSRJ2W6BNiLmn"])

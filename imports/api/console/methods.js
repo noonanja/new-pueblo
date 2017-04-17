@@ -45,6 +45,7 @@ export const simulate = new ValidatedMethod({
           }
         }
       );
+      console.log(simId);
       _execSync(simId, consoleUpdateLoads, consoleErr);
     }
 
@@ -52,15 +53,16 @@ export const simulate = new ValidatedMethod({
 });
 
 const consoleUpdateLoads = function(_data, simId) {
-  Console.update(
-    {_id: simId},
-    {
-      $set: {
-        activeAggLoad: [69,69,69],
-        // activeLoads: activeLoads,
-      }
-    }
-  );
+  console.log(_data);
+  // Console.update(
+  //   {_id: simId},
+  //   {
+  //     $set: {
+  //       // activeAggLoad: [69,69,69],
+  //       // activeLoads: activeLoads,
+  //     }
+  //   }
+  // );
 };
 
 const consoleErr = function(_data, simId) {
