@@ -96,6 +96,7 @@ class Simulation(object):
 
         # hourly charge limit
         j = 0
+        print "self.cEF", self.cEF
         for i in xrange(0, 24):
             # (amount charged * cEF) - (amount discharged * dEF) <= mCR
             self.h[i]      =  self.mCR
@@ -113,23 +114,23 @@ class Simulation(object):
             self.h[i+48] = self.qZero*(self.lR**(i+1))
             for j in xrange(0, (2*(i+1)), 2):
                 # charge limit
-                self.G[i+24][j]   =  (self.lR**((i)-j/2))*self.cEF
-                self.G[i+24][j+1] = -(self.lR**((i)-j/2))*self.dEF
+                self.G[i+24][j]   =   self.lR**(i-j/2)  * self.cEF
+                self.G[i+24][j+1] = -(self.lR**(i-j/2)) * self.dEF
                 # discharge limit
-                self.G[i+48][j]   =  (self.lR**((i)-j/2))*self.dEF
-                self.G[i+48][j+1] = -(self.lR**((i)-j/2))*self.cEF
+                self.G[i+48][j]   = -(self.lR**(i-j/2)) * self.cEF
+                self.G[i+48][j+1] =   self.lR**(i-j/2)  * self.dEF
 
         # (remaining new charge - natural leakage) - initial q charge level =
         # tiny epsilon value
         self.h[72] = self.epsilon + (1 - self.lR**24)*self.qZero
-        self.h[73] = self.epsilon + (1 - self.lR**24)*self.qZero
+        self.h[73] = self.epsilon - (1 - self.lR**24)*self.qZero
         for j in xrange(0, 48, 2):
             #  remaining new charge < epsilon + natural leakage
             self.G[72][j]   =  (self.lR**(23-j/2))*self.cEF
             self.G[72][j+1] = -(self.lR**(23-j/2))*self.dEF
-            # -remaining new charge < epsilon + natural leakage
-            self.G[73][j]   =  (self.lR**(23-j/2))*self.dEF
-            self.G[73][j+1] = -(self.lR**(23-j/2))*self.cEF
+            # -remaining new charge < epsilon - natural leakage
+            self.G[73][j]   = -(self.lR**(23-j/2))*self.cEF
+            self.G[73][j+1] =  (self.lR**(23-j/2))*self.dEF
 
         # hourly charge or discharge must be non-negative
         for i in xrange(0, 48):
