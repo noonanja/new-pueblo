@@ -180,6 +180,7 @@ class Main extends Component {
         alert(err);
       }
       if (res) {
+        FlowRouter.go(`/simulations/${res}`);
         let countdown = 1;
         while (countdown > 0) {
           Meteor.call('simulations.simulate',
