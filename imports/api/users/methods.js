@@ -16,13 +16,14 @@ export const partition = new ValidatedMethod({
   }).validator(),
   run({userTypes}) {
     // reset all users to passive users
-    Users.update(
+    const x = Users.update(
       { $or: [{hasStore: true}, {hasGen: true}] },
       {
         $set: {hasStore: false, hasGen: false},
       },
-      { multi: true }
+      { multi: true, }
     );
+    console.log(x);
 
     // insert storer-generators
     const sgConvert = userTypes[0];
@@ -49,4 +50,21 @@ const addActive = function(count, hasStore, hasGen) {
   toConvert.forEach(function(id) {
     Users.update({_id: id}, {$set: {hasStore: hasStore, hasGen: hasGen}});
   });
+}
+
+// Get list of all method names on simulations
+const USERS_METHODS = _.pluck([
+  partition,
+], 'name');
+
+if (Meteor.isServer) {
+  // Only allow 1 list operations per connection per 5 seconds
+  DDPRateLimiter.addRule({
+    name(name) {
+      return _.contains(USERS_METHODS, name);
+    },
+
+    // Rate limit per connection ID
+    connectionId() { return true; },
+  }, 1, 5000);
 }

@@ -14,6 +14,7 @@ import {
   insert,
   simulate,
 } from '../../api/simulations/methods.js';
+import { partition } from '../../api/users/methods.js';
 
 // Local collections
 import { Users }    from '../../api/users/users.js';
@@ -244,11 +245,11 @@ class Main extends Component {
 
     // Partition the passive users into active and passive users
     // using the local mongo collections
-    Meteor.call('users.partition', {userTypes: this.state.userTypes});
-
+    partition.call({userTypes: this.state.userTypes});
     const passiveLoad = AggLoads.findOne({initial: false, active: false});
     const activeLoad  = AggLoads.findOne({active: true});
     const activeLoads = Loads.find({$or: [{hasStore: true, hasGen: true}]}).fetch();
+
     insert.call({formInput: this.state, passiveLoad: passiveLoad, activeLoad: activeLoad, activeLoads: activeLoads}, (err, res) => {
       if (err) {
         alert(err);

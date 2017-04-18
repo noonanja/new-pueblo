@@ -14,14 +14,14 @@ export const insert = new ValidatedMethod({
     activeLoads: {type: [Schema.loads]},
   }).validator(),
   run({formInput, passiveLoad, activeLoad, activeLoads}) {
-    return Simulations.insert({
-      name: 'sim',
-      timestamp: new Date().getTime(),
-      requirements: formInput,
-      passiveLoad: passiveLoad,
-      activeLoad: activeLoad,
-      activeLoads: activeLoads,
-    });
+      return Simulations.insert({
+        name: 'sim',
+        timestamp: new Date().getTime(),
+        requirements: formInput,
+        passiveLoad: passiveLoad,
+        activeLoad: activeLoad,
+        activeLoads: activeLoads,
+      });
   },
 });
 
