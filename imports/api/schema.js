@@ -23,7 +23,8 @@ Schema.loads = new SimpleSchema({
   e: {type: [Number], decimal: true},
   s: {type: [Number], decimal: true},
   g: {type: [Number], decimal: true},
-  sCentroid: {type: [Number], decimal: true, optional: true},
+  sCCentroid: {type: [Number], decimal: true},
+  sDCentroid: {type: [Number], decimal: true},
 });
 
 Schema.publicFields.Loads = {
@@ -62,7 +63,7 @@ Schema.formInput = new SimpleSchema({
   maxDailyProduction: {type: Number, decimal: true},
 });
 
-Schema.Console = new SimpleSchema({
+Schema.simulations = new SimpleSchema({
   name: {type: String},
   timestamp: {type: Date},
   requirements: {type: Schema.formInput},
@@ -72,7 +73,7 @@ Schema.Console = new SimpleSchema({
   error: {type: String, optional: true}
 });
 
-Schema.publicFields.Console = {
+Schema.publicFields.Simulations = {
   _id: 1,
   name: 1,
   timestamp: 1,

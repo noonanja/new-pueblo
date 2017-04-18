@@ -3,7 +3,7 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method';
 import { Users } from './users.js';
 import { Loads } from '../loads/loads.js';
 import { AggLoads } from '../aggLoads/aggLoads.js';
-import { Console } from '../console/console.js';
+import { Console } from '../simulations/simulations.js';
 
 import { Constraints } from '/lib/constraints.js';
 import { Schema } from '../schema.js';

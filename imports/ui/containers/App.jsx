@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 
@@ -6,13 +7,13 @@ import { Meteor } from 'meteor/meteor';
 // inside a React component), we need to wrap our component in a container using
 // the createContainer Higher Order Component
 import { createContainer } from 'meteor/react-meteor-data';
-import { Users }    from '../api/users/users.js';
-import { AggLoads } from '../api/aggLoads/aggLoads.js';
-import { Loads } from '../api/loads/loads.js';
+import { Users }    from '../../api/users/users.js';
+import { AggLoads } from '../../api/aggLoads/aggLoads.js';
+import { Loads } from '../../api/loads/loads.js';
 
-import ChartUsers from './ChartUsers.jsx';
-import ChartAgg from './ChartAgg.jsx';
-import ChartPrice from './ChartPrice.jsx';
+import ChartUsers from '../components/ChartUsers.jsx';
+import ChartAgg from '../components/ChartAgg.jsx';
+import ChartPrice from '../components/ChartPrice.jsx';
 
 // Contraints for DERs drawn from paper
 import { Constraints } from '/lib/constraints.js';
@@ -174,56 +175,37 @@ class App extends Component {
     Meteor.call('users.partition', {userTypes: this.state.userTypes});
 
     const passiveLoad = this.props.finalPassiveLoad;
-    Meteor.call('console.setSim', {formInput: this.state, passiveLoadValues: passiveLoad.values}, (err, res) => {
+    Meteor.call('simulations.setSim', {formInput: this.state, passiveLoadValues: passiveLoad.values}, (err, res) => {
       if (err) {
         alert(err);
       }
       if (res) {
         let countdown = 1;
         while (countdown > 0) {
-          Meteor.call('console.simulate',
+          Meteor.call('simulations.simulate',
           {
             simId: res,
             activeAggLoad: this.props.finalActiveLoad.values,
             activeLoads: this.props.activeLoads,
           });
-          countdown -= 1;
+          console.log(activeLoads);
+          activeLoads.forEach(function(load) {
+            const sPrime = Math.subtract(load.sCCentroid, load.sDCentroid);
+            Loads.update({_id: load._id},
+                         {
+                          $set: {
+                            l: Math.add(load.e, sPrime),
+                            s: sPrime,
+                            sCCentroid: load.sCCentroid,
+                            sDCentroid: load.sDCentroid,
+                          },
+                         })
+            })
+        }
+        countdown -= 1;
         }
       }
-    });
-
-
-    // const cmd = "python " + "../../../../../server/.scripts/argmin.py " + id;
-    // let x_prime = _execSync(cmd, consoleInsert, consoleInsert);
-    // let countdown = 5;
-    // while (countdown > 1) {
-      // activeLoad = AggLoads.findOne({active: true});
-      // Users.find({active: true}).forEach(function(user) {
-      //       //////////////////////////////////////////////////////
-      //   // Given Aggregate Load and the constraints from the form input,
-      //   // minimize the user's cost objective function
-      //     //////////////////////////////////////////////////////
-      //   load = Loads.find({userId: user._id});
-      //   let otherActiveAgg = Math.subtract(activeLoad, load.l);
-      //
-      //   let s_prime = _execSync(cmd, consoleInsert, consoleInsert);
-      //   let s = s_prime['s'];
-      //   let g = s_prime['g'];
-      //
-      //   // If the NE has been reached, each user updates their strategy "centroid"
-      //   Loads.update({userId: user._id},
-      //                {
-      //                  $set : {
-      //                    l: Math.add(load.e, Math.subtract(s, g)),
-      //                    s: s,
-      //                    g: g,
-      //                  }
-      //                }
-      //   );
-      // });
-      // countdown -= 1;
-    // }
-
+    );
   }
 
   renderSubmit() {
@@ -310,11 +292,11 @@ class App extends Component {
 }
 
 App.propTypes = {
-  loading: React.PropTypes.bool,
-  initialLoad: React.PropTypes.object,
-  finalPassiveLoad: React.PropTypes.object,
-  finalActiveLoad: React.PropTypes.object,
-  activeLoads: PropTypes.arrayOf(React.PropTypes.object),
+  loading: PropTypes.bool,
+  initialLoad: PropTypes.object,
+  finalPassiveLoad: PropTypes.object,
+  finalActiveLoad: PropTypes.object,
+  activeLoads: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default createContainer(({ params }) => {
@@ -330,6 +312,10 @@ export default createContainer(({ params }) => {
   const finalActiveLoadExists = !loading && !!finalActiveLoad;
 
   const activeLoads = Loads.find({ $or: [{hasStore: true}, {hasGen: true}] }).fetch();
+
+  // const simulationsHandle = Meteor.subscribe('simulations');
+  // const console
+  console.log(params);
 
   return {
     loading,

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 const DoughnutChart = require('react-chartjs-2').Doughnut;
 
@@ -56,6 +57,6 @@ export default class ChartUsers extends Component {
 }
 
 ChartUsers.propTypes = {
-  userTypes: React.PropTypes.array,
-  userCount: React.PropTypes.number,
+  userTypes: PropTypes.array,
+  userCount: PropTypes.number,
 };

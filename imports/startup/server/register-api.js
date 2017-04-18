@@ -3,6 +3,6 @@ import '../../api/users/server/publications.js';
 
 import '../../api/aggLoads/server/publications.js';
 
-import '../../api/console/server/exec.js';
-import '../../api/console/server/publications.js';
-import '../../api/console/methods.js';
+import '../../api/simulations/server/exec.js';
+import '../../api/simulations/server/publications.js';
+import '../../api/simulations/methods.js';

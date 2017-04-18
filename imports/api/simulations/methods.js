@@ -2,19 +2,19 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
 import { Users } from '../users/users.js';
 import { Loads } from '../loads/loads.js';
-import { Console } from './console.js';
+import { Simulations } from './simulations.js';
 
 import { Schema } from '../schema.js';
 
 
 export const setSim = new ValidatedMethod({
-  name: 'console.setSim',
+  name: 'simulations.setSim',
   validate: new SimpleSchema({
     formInput: {type: Schema.formInput},
     passiveLoadValues: {type: [Number], decimal: true},
   }).validator(),
   run({formInput, passiveLoadValues}) {
-    return Console.insert({
+    return Simulations.insert({
       name: 'sim',
       timestamp: new Date().getTime(),
       requirements: formInput,
@@ -26,7 +26,7 @@ export const setSim = new ValidatedMethod({
 });
 
 export const simulate = new ValidatedMethod({
-  name: 'console.simulate',
+  name: 'simulations.simulate',
   validate: new SimpleSchema({
     simId: { type: String, regEx: SimpleSchema.RegEx.Id },
     activeAggLoad: {type: [Number], decimal: true},
@@ -36,7 +36,7 @@ export const simulate = new ValidatedMethod({
     if (this.isSimulation) {
       // client only code
     } else {
-      Console.update(
+      Simulations.update(
         {_id: simId},
         {
           $set: {
@@ -45,15 +45,13 @@ export const simulate = new ValidatedMethod({
           }
         }
       );
-      _execSync(simId, consoleUpdateLoads, consoleErr);
+      _execSync(simId, simUpdateLoads, simErr);
     }
-
   },
 });
 
-const consoleUpdateLoads = function(_data, simId) {
-  // console.log(_data);
-  // Console.update(
+const simUpdateLoads = function(_data, simId) {
+  // Simulations.update(
   //   {_id: simId},
   //   {
   //     $set: {
@@ -64,8 +62,8 @@ const consoleUpdateLoads = function(_data, simId) {
   // );
 };
 
-const consoleErr = function(_data, simId) {
-  Console.update(
+const simErr = function(_data, simId) {
+  Simulations.update(
     {_id: simId},
     {
       $set: {

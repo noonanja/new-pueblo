@@ -1,8 +1,9 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 const BarChart = require("react-chartjs-2").Bar;
 
-import { gridK } from '../api/loads/hourlyStats.js';
+import { gridK } from '../../api/loads/hourlyStats.js';
 
 const aggOptions = { responsive: true, };
 
@@ -53,7 +54,7 @@ export default class ChartPrice extends Component {
 }
 
 ChartPrice.propTypes = {
-  initialValues: React.PropTypes.arrayOf(React.PropTypes.number),
-  finalActiveValues: React.PropTypes.arrayOf(React.PropTypes.number),
-  finalPassiveValues: React.PropTypes.arrayOf(React.PropTypes.number),
+  initialValues: PropTypes.arrayOf(PropTypes.number),
+  finalActiveValues: PropTypes.arrayOf(PropTypes.number),
+  finalPassiveValues: PropTypes.arrayOf(PropTypes.number),
 };

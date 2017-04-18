@@ -77,7 +77,6 @@ class Simulation(object):
         self.epsilon = 0.0001 # note: 0 in paper
 
         self.tau  = 3*(userTypes[2] - 1)*max([k for k in gridK]) + 1 # tau > 3*(N - 1)*max(gridPrice)
-        self.sBar = np.zeros((48))
         # Centroid is [sPos1, sNeg1, sPos2, sNeg2,...sPos24, sNeg24]T
 
         """
@@ -140,7 +139,7 @@ class Simulation(object):
         for i in xrange(0, 48):
             self.G[74+i][i] = -1
 
-    def storer_minimize(self, e, otherAgg):
+    def storer_minimize(self, e, otherAgg, sCentroid):
         """
         Objective function: argmin ~s~ { f(otherAgg) }
                             where f(otherAgg) =
@@ -153,8 +152,8 @@ class Simulation(object):
         """
         q = []
         for i in xrange(0, 47, 2): # grid prices are indexed from 1
-            q.append( 2*e[i/2]*gridK[i/2+1] + gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*self.sBar[i])
-            q.append(-2*e[i/2]*gridK[i/2+1] - gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*self.sBar[i+1])
+            q.append( 2*e[i/2]*gridK[i/2+1] + gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*sCentroid[i])
+            q.append(-2*e[i/2]*gridK[i/2+1] - gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*sCentroid[i+1])
         q = np.array(q)
 
         return solvers.qp(matrix(self.P), matrix(q), matrix(self.G), matrix(self.h))['x']
@@ -165,22 +164,24 @@ class Simulation(object):
             otherActiveAgg = np.subtract(self.activeAggLoad, load['l'])
             otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
             if (load['hasStore'] and not load['hasGen']):
-                s = self.storer_minimize(load['e'], otherAgg)
-                db.console.update_one(\
-                    {'_id': simId},\
-                    {'$set': {'activeLoads.'+str(i)+'.sCentroid': [s[j] for j in xrange(0, len(s))]}}\
-                     )
-                print load['userId']
-                print load['hasStore']
-                print load['hasGen']
-                print "charged", sum([s[i] for i in xrange(0, len(s), 2)])
-                print "discharged", sum([s[i] for i in xrange(1, len(s)-1, 2)])
+                s = self.storer_minimize(load['e'], otherAgg, load['sCentroid'])
+                db.simulations.update_one( \
+                    {'_id': simId}, \
+                    {'$set': {'activeLoads.'+str(i)+'.sCCentroid': [s[j] for j in xrange(0, len(s), 2)]},\
+                              'activeLoads.'+str(i)+'.sDCentroid': [s[j] for j in xrange(1, len(s), 2)]
+                             }\
+                )
+                # print load['userId']
+                # print load['hasStore']
+                # print load['hasGen']
+                # print "charged", sum([s[i] for i in xrange(0, len(s), 2)])
+                # print "discharged", sum([s[i] for i in xrange(1, len(s)-1, 2)])
                 print s
                 sys.stdout.flush()
 
 
 def main(args):
-    sim = db.console.find_one(args[1])
+    sim = db.simulations.find_one(args[1])
     requirements = sim['requirements']
     simulation = Simulation(requirements['userTypes'],
                             float(requirements['cEfficiency']) / 100,
@@ -201,4 +202,4 @@ def main(args):
 
 if __name__ == "__main__":
     # main(sys.argv)
-    main(["blank", "ahwjyaEkBukr5BYhu"])
+    main(["blank", "R5ZntkFWqujhHMbDR"])

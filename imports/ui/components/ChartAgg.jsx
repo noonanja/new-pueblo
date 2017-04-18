@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 const BarChart = require("react-chartjs-2").Bar;
 
@@ -50,7 +51,7 @@ export default class ChartAgg extends Component {
 }
 
 ChartAgg.propTypes = {
-  initialLoad: React.PropTypes.object,
-  finalPassiveLoad: React.PropTypes.object,
-  finalActiveLoad: React.PropTypes.object,
+  initialLoad: PropTypes.object,
+  finalPassiveLoad: PropTypes.object,
+  finalActiveLoad: PropTypes.object,
 };

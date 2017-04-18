@@ -56,17 +56,17 @@ export const denormalizers = {
   afterInsertUsers(userId, hasStore, hasGen) {
     const le = drawConsumption();
     // Initialize active users with no storage/ generation strategies
-    const s = Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0);
-    const g = Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0);
+    const i = Array.apply(null, Array(24)).map(Number.prototype.valueOf, 0);
     Loads.insert({
       userId: userId,
       hasStore: hasStore,
       hasGen: hasGen,
       l: le,
       e: le,
-      s: s,
-      g: g,
-      sCentroid: Array.apply(null, Array(48)).map(Number.prototype.valueOf, 0),
+      s: i,
+      g: i,
+      sCCentroid: i,
+      sDCentroid: i,
     });
   },
   afterUpdateUsers(selector, modifier) {
