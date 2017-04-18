@@ -2,8 +2,9 @@ import React from 'react';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { mount } from 'react-mounter';
 
-import App from '../../ui/containers/App.jsx';
-// import ListPageContainer from '../../ui/containers/ListPageContainer.js';
+import App from '../../ui/App.jsx';
+import Header from '../../ui/components/Header.jsx';
+import Main from '../../ui/components/Main.jsx';
 
 // FlowRouter.route('/simulations/:_id', {
 //   name: 'Simulations.show',
@@ -17,6 +18,6 @@ import App from '../../ui/containers/App.jsx';
 FlowRouter.route('/', {
   name: 'App.home',
   action() {
-    mount(App, { main: null });
+    mount(App, { header: <Header />, main: <Main /> });
   },
 });

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
+
 import { Meteor } from 'meteor/meteor';
 
 // to use react-meteor-data (allowing us to use data from a Meteor collection
@@ -32,7 +32,7 @@ marks[maxActive]= `${maxActive}`;
 
 
 // App component - represents the whole app
-class App extends Component {
+class Main extends Component {
   constructor(props) {
     super(props);
 
@@ -228,70 +228,52 @@ class App extends Component {
 
   render() {
     return (
-      <div id="canvas">
-        <div id="header-wrapper">
-          <h1 className="header"> New Pueblo </h1>
-          <ul id="main-nav">
-            <li> <a href= "/"> model </a></li>
-            <li> <a href= "/"> about</a></li>
-          </ul>
+    <div>
+      <div className="row">
+        <div className="one-half column">
+          <h5> Demand-Side Users </h5>
+            <p>Active Users</p>
+            {this.renderRange()}
         </div>
-
-        <div className="container">
-            <div className="row">
-              <div className="one-half column">
-                <h5> Demand-Side Users </h5>
-                  <p>Active Users</p>
-                  {this.renderRange()}
-              </div>
-              <div className="one-half column">
-                {this.renderChartUsers()}
-              </div>
-            </div>
-
-            <div className="row der-constraints">
-              <div className="two-thirds column">
-                <h5> Storage </h5>
-                {this.renderStorage()}
-              </div>
-              <div className="one-third column">
-                <h5> Production </h5>
-                {this.renderProduction()}
-              </div>
-            </div>
-
-            <div className= "row simulate">
-              {this.renderSimulate()}
-            </div>
-
-            <div className="chart-section">
-              <div className="row">
-                <h6 className="graph-header"> Aggregate Load </h6>
-                <ChartAgg initialLoad={this.props.initialLoad} finalPassiveLoad={this.props.finalPassiveLoad}
-                          finalActiveLoad={this.props.finalActiveLoad} />
-              </div>
-              <div className="row">
-                <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
-                <ChartPrice initialValues={this.props.initialLoad.values}
-                            finalPassiveValues = {this.props.finalPassiveLoad.values}
-                            finalActiveValues  = {this.props.finalActiveLoad.values} />
-              </div>
-            </div>
-
-            <div className="row footer-wrapper">
-              <footer id="footer" >
-                © 2017 Jacob Noonan
-              </footer>
-            </div>
-
+        <div className="one-half column">
+          {this.renderChartUsers()}
         </div>
-
       </div>
+
+      <div className="row der-constraints">
+        <div className="two-thirds column">
+          <h5> Storage </h5>
+          {this.renderStorage()}
+        </div>
+        <div className="one-third column">
+          <h5> Production </h5>
+          {this.renderProduction()}
+        </div>
+      </div>
+
+      <div className= "row simulate">
+        {this.renderSimulate()}
+      </div>
+
+      <div className="chart-section">
+        <div className="row">
+          <h6 className="graph-header"> Aggregate Load </h6>
+          <ChartAgg initialLoad={this.props.initialLoad} finalPassiveLoad={this.props.finalPassiveLoad}
+                    finalActiveLoad={this.props.finalActiveLoad} />
+        </div>
+        <div className="row">
+          <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
+          <ChartPrice initialValues={this.props.initialLoad.values}
+                      finalPassiveValues = {this.props.finalPassiveLoad.values}
+                      finalActiveValues  = {this.props.finalActiveLoad.values} />
+        </div>
+      </div>
+    </div>
     );
   }
 }
 
-App.propTypes = {
+Main.propTypes = {
   loading: PropTypes.bool,
   initialLoad: PropTypes.object,
   finalPassiveLoad: PropTypes.object,
@@ -299,7 +281,8 @@ App.propTypes = {
   activeLoads: PropTypes.arrayOf(PropTypes.object),
 };
 
-export default createContainer(({ params }) => {
+
+export default AppContainer = createContainer(({ params }) => {
   const aggLoadsHandle = Meteor.subscribe('aggLoads');
   const loading = !aggLoadsHandle.ready();
   const initialLoad = AggLoads.findOne({initial: true});
@@ -324,4 +307,4 @@ export default createContainer(({ params }) => {
     finalActiveLoad: finalActiveLoadExists  ? {n: finalActiveLoad.n, values: finalActiveLoad.l} : { n: 0, values: [] },
     activeLoads: activeLoads,
   };
-}, App);
+}, Main);
