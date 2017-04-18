@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 
-import { createContainer } from 'meteor/react-meteor-data';
 
 // App component - represents the whole app
 export default class App extends Component {
@@ -18,7 +17,6 @@ export default class App extends Component {
                 © 2017 Jacob Noonan
               </footer>
             </div>
-
         </div>
       </div>
     );

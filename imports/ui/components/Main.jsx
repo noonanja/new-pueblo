@@ -7,6 +7,7 @@ import { Meteor } from 'meteor/meteor';
 // inside a React component), we need to wrap our component in a container using
 // the createContainer Higher Order Component
 import { createContainer } from 'meteor/react-meteor-data';
+
 import { Users }    from '../../api/users/users.js';
 import { AggLoads } from '../../api/aggLoads/aggLoads.js';
 import { Loads } from '../../api/loads/loads.js';
@@ -282,8 +283,7 @@ Main.propTypes = {
   activeLoads: PropTypes.arrayOf(PropTypes.object),
 };
 
-
-export default AppContainer = createContainer(({ params }) => {
+export default MainContainer = createContainer(({ params }) => {
   const aggLoadsHandle = Meteor.subscribe('aggLoads');
   const loading = !aggLoadsHandle.ready();
   const initialLoad = AggLoads.findOne({initial: true});
