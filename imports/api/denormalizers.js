@@ -66,6 +66,7 @@ export const denormalizers = {
       e: le,
       s: s,
       g: g,
+      sCentroid: Array.apply(null, Array(48)).map(Number.prototype.valueOf, 0),
     });
   },
   afterUpdateUsers(selector, modifier) {

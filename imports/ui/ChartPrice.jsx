@@ -8,7 +8,7 @@ const aggOptions = { responsive: true, };
 
 export default class ChartPrice extends Component {
   costPerKwH(value, h) {
-    return (Math.pow(value, 2) * gridK[h]).toFixed(5);
+    return (value * gridK[h]).toFixed(5);
   }
 
   chartPriceData() {

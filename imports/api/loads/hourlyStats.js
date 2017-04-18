@@ -37,7 +37,7 @@ export function drawConsumption() {
   });
 }
 
-const kNight = 6.625e-7;
+const kNight = 0.00007;
 const kDay   = 1.5*kNight;
 
 export const gridK = {

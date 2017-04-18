@@ -74,7 +74,7 @@ class Simulation(object):
         self.activeLoads = activeLoads
 
         self.qZero   = .25*c
-        self.epsilon = 0.00 # note: 0 in paper
+        self.epsilon = 0.0001 # note: 0 in paper
 
         self.tau  = 3*(userTypes[2] - 1)*max([k for k in gridK]) + 1 # tau > 3*(N - 1)*max(gridPrice)
         self.sBar = np.zeros((48))
@@ -157,18 +157,19 @@ class Simulation(object):
             q.append(-2*e[i/2]*gridK[i/2+1] - gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*self.sBar[i+1])
         q = np.array(q)
 
-        print "matrix P", self.P
-        print "matrix q", q
-
         return solvers.qp(matrix(self.P), matrix(q), matrix(self.G), matrix(self.h))['x']
 
-    def simulate(self):
+    def simulate(self, simId):
         # load = self.activeLoads[4]
-        for load in self.activeLoads:
+        for i, load in enumerate(self.activeLoads):
             otherActiveAgg = np.subtract(self.activeAggLoad, load['l'])
             otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
             if (load['hasStore'] and not load['hasGen']):
                 s = self.storer_minimize(load['e'], otherAgg)
+                db.console.update_one(\
+                    {'_id': simId},\
+                    {'$set': {'activeLoads.'+str(i)+'.sCentroid': [s[j] for j in xrange(0, len(s))]}}\
+                     )
                 print load['userId']
                 print load['hasStore']
                 print load['hasGen']
@@ -195,9 +196,9 @@ def main(args):
                             sim['activeAggLoad'],
                             sim['activeLoads']
                             )
-    simulation.simulate()
+    simulation.simulate(args[1])
 
 
 if __name__ == "__main__":
     # main(sys.argv)
-    main(["blank", "EfnidSRJ2W6BNiLmn"])
+    main(["blank", "ahwjyaEkBukr5BYhu"])

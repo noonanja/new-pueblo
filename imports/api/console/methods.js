@@ -45,7 +45,6 @@ export const simulate = new ValidatedMethod({
           }
         }
       );
-      console.log(simId);
       _execSync(simId, consoleUpdateLoads, consoleErr);
     }
 
@@ -53,7 +52,7 @@ export const simulate = new ValidatedMethod({
 });
 
 const consoleUpdateLoads = function(_data, simId) {
-  console.log(_data);
+  // console.log(_data);
   // Console.update(
   //   {_id: simId},
   //   {

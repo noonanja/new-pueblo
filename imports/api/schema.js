@@ -23,6 +23,7 @@ Schema.loads = new SimpleSchema({
   e: {type: [Number], decimal: true},
   s: {type: [Number], decimal: true},
   g: {type: [Number], decimal: true},
+  sCentroid: {type: [Number], decimal: true, optional: true},
 });
 
 Schema.publicFields.Loads = {
