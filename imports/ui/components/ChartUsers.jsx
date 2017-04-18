@@ -5,12 +5,7 @@ const DoughnutChart = require('react-chartjs-2').Doughnut;
 
 const aggOptions = { animation: {
                       animateScale: true,
-                    },
-                    // title: {
-                    //   text: "Active Users",
-                    //   fontSize: 16,
-                    //   display: true,
-                    // },
+                    },  
                     legend: {
                       position: 'right',
                     }

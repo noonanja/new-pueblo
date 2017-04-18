@@ -10,6 +10,10 @@ import { createContainer } from 'meteor/react-meteor-data';
 
 // Server-side collection we are subscribed to
 import { Simulations } from  '../../api/simulations/simulations.js';
+import {
+  insert,
+  simulate,
+} from '../../api/simulations/methods.js';
 
 // Local collections
 import { Users }    from '../../api/users/users.js';
@@ -79,13 +83,6 @@ class Main extends Component {
     });
   }
 
-
-  renderChartUsers() {
-    return (
-        <ChartUsers userTypes={this.state.userTypes} userCount={userCount} />
-    )
-  }
-
   renderRange() {
     return (
         <div className="range">
@@ -94,6 +91,12 @@ class Main extends Component {
             min={0} max={maxActive} pushable={true} marks ={marks} ref= "range"
             defaultValue={Constraints.defaultUserTypes} step={Constraints.defaultStep} included={false}/>
         </div>
+    )
+  }
+
+  renderChartUsers() {
+    return (
+        <ChartUsers userTypes={this.state.userTypes} userCount={userCount} />
     )
   }
 
@@ -165,55 +168,6 @@ class Main extends Component {
     )
   }
 
-  handleChange(event) {
-    const target = event.target;
-    const value = parseFloat(target.value);
-    const name = target.name;
-    this.setState({[name]: value});
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-
-    // Partition the passive users into active and passive users
-    // using the local mongo collections
-    Meteor.call('users.partition', {userTypes: this.state.userTypes});
-
-    const passiveLoad = this.props.finalPassiveLoad;
-    Meteor.call('simulations.setSim', {formInput: this.state, passiveLoadValues: passiveLoad.values}, (err, res) => {
-      if (err) {
-        alert(err);
-      }
-      if (res) {
-        FlowRouter.go(`/simulations/${res}`);
-        let countdown = 1;
-        while (countdown > 0) {
-          Meteor.call('simulations.simulate',
-          {
-            simId: res,
-            activeAggLoad: this.props.finalActiveLoad.values,
-            activeLoads: this.props.activeLoads,
-          });
-          console.log(activeLoads);
-          activeLoads.forEach(function(load) {
-            const sPrime = Math.subtract(load.sCCentroid, load.sDCentroid);
-            Loads.update({_id: load._id},
-                         {
-                          $set: {
-                            l: Math.add(load.e, sPrime),
-                            s: sPrime,
-                            sCCentroid: load.sCCentroid,
-                            sDCentroid: load.sDCentroid,
-                          },
-                         })
-            })
-        }
-        countdown -= 1;
-        }
-      }
-    );
-  }
-
   renderSubmit() {
     return (
       <form onSubmit={this.handleSubmit}>
@@ -264,40 +218,60 @@ class Main extends Component {
       <div className="chart-section">
         <div className="row">
           <h6 className="graph-header"> Aggregate Load </h6>
-          <ChartAgg initialLoad={this.props.initialLoad} finalPassiveLoad={this.props.finalPassiveLoad}
-                    finalActiveLoad={this.props.finalActiveLoad} />
+          <ChartAgg initialLoad={this.props.initialLoad} passiveLoad={this.props.passiveLoad}
+                    activeLoad={this.props.activeLoad} />
         </div>
         <div className="row">
           <h6 className="graph-header"><strong> Price/ Unit Energy </strong></h6>
           <ChartPrice initialValues={this.props.initialLoad.values}
-                      finalPassiveValues = {this.props.finalPassiveLoad.values}
-                      finalActiveValues  = {this.props.finalActiveLoad.values} />
+                      passiveValues = {this.props.passiveLoad.values}
+                      activeValues  = {this.props.activeLoad.values} />
         </div>
       </div>
     </div>
     );
   }
+
+  handleChange(event) {
+    const target = event.target;
+    const value = parseFloat(target.value);
+    const name = target.name;
+    this.setState({[name]: value});
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+
+    // Partition the passive users into active and passive users
+    // using the local mongo collections
+    Meteor.call('users.partition', {userTypes: this.state.userTypes});
+
+    const passiveLoad = AggLoads.findOne({initial: false, active: false});
+    const activeLoad  = AggLoads.findOne({active: true});
+    const activeLoads = Loads.find({$or: [{hasStore: true, hasGen: true}]}).fetch();
+    insert.call({formInput: this.state, passiveLoad: passiveLoad, activeLoad: activeLoad, activeLoads: activeLoads}, (err, res) => {
+      if (err) {
+        alert(err);
+      }
+      if (res) {
+        FlowRouter.go(`/simulation/${res}`);
+        simulate.call({ simId: res, });
+       }
+      }
+    );
+  }
+
 }
 
 Main.propTypes = {
   loading: PropTypes.bool,
   initialLoad: PropTypes.object,
-  finalPassiveLoad: PropTypes.object,
-  finalActiveLoad: PropTypes.object,
-  activeLoads: PropTypes.arrayOf(PropTypes.object),
+  passiveLoad: PropTypes.object,
+  activeLoad: PropTypes.object,
 };
 
 export default MainContainer = createContainer(({ params }) => {
-  const aggLoadsHandle = Meteor.subscribe('aggLoads');
-  const loading = !aggLoadsHandle.ready();
   const initialLoad = AggLoads.findOne({initial: true});
-  const initialLoadExists = !loading && !!initialLoad;
-
-  const finalPassiveLoad = AggLoads.findOne({initial: false, active: false});
-  const finalPassiveLoadExists = !loading && !!finalPassiveLoad;
-
-  const finalActiveLoad = AggLoads.findOne({initial: false, active: true});
-  const finalActiveLoadExists = !loading && !!finalActiveLoad;
 
   const simulationsHandle = Meteor.subscribe('simulations', params._id);
   const simulationLoading = !simulationsHandle.ready();
@@ -305,10 +279,9 @@ export default MainContainer = createContainer(({ params }) => {
   const simulationExists = !simulationLoading && !!simulation;
 
   return {
-    loading,
-    initialLoad: initialLoadExists    ? {n: initialLoad.n, values: initialLoad.l} : { n: 0, values: [] },
-    finalPassiveLoad: finalPassiveLoadExists ? {n: finalPassiveLoad.n, values: finalPassiveLoad.l} : { n: 0, values: [] },
-    finalActiveLoad: finalActiveLoadExists  ? {n: finalActiveLoad.n, values: finalActiveLoad.l} : { n: 0, values: [] },
-    activeLoads: simulationExists ? simulation.activeLoads : []
+    simulationLoading,
+    initialLoad: {n: initialLoad.n, values: initialLoad.l},
+    passiveLoad: simulationExists ? {n: simulation.passiveLoad.n, values: simulation.passiveLoad.l} : { n: 0, values: [] },
+    activeLoad:  simulationExists ? {n: simulation.activeLoad.n, values: simulation.activeLoad.l} : { n: 0, values: [] },
   };
 }, Main);

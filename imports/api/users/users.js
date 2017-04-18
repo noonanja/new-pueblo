@@ -28,10 +28,3 @@ class UsersCollection extends Mongo.Collection {
 export const Users = new UsersCollection('users', { connection: null } ); // local Collection
 
 Users.attachSchema(Schema.users);
-
-// Deny all client-side updates since we will be using methods to manage this collection
-Users.deny({
-  insert() { return true; },
-  update() { return true; },
-  remove() { return true; },
-});

@@ -39,6 +39,7 @@ Schema.publicFields.Loads = {
 
 
 Schema.aggLoads = new SimpleSchema({
+  _id: { type: String, regEx: SimpleSchema.RegEx.Id, optional: true },
   active: {type: Boolean},
   initial: {type: Boolean, optional: true},
   n : {type: Number},
@@ -67,8 +68,8 @@ Schema.simulations = new SimpleSchema({
   name: {type: String},
   timestamp: {type: Date},
   requirements: {type: Schema.formInput},
-  passiveLoadValues: {type: [Number]},
-  activeAggLoad: {type: [Number]},
+  passiveLoad: {type: Schema.aggLoads},
+  activeLoad: {type: Schema.aggLoads},
   activeLoads: {type: [Schema.loads]},
   error: {type: String, optional: true}
 });
@@ -78,8 +79,8 @@ Schema.publicFields.Simulations = {
   name: 1,
   timestamp: 1,
   requirements: 1,
-  passiveLoadValues: 1,
-  activeAggLoad: 1,
+  passiveLoad: 1,
+  activeLoad: 1,
   activeLoads: 1,
   error: 1,
 };

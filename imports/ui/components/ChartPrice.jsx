@@ -19,11 +19,11 @@ export default class ChartPrice extends Component {
       initialPrices.push(this.costPerKwH(initialValues[i], i+1));
     }
 
-    const finalPassiveValues = this.props.finalPassiveValues.slice(0);
-    const finalActiveValues = this.props.finalActiveValues.slice(0);
+    const passiveValues = this.props.passiveValues.slice(0);
+    const activeValues = this.props.activeValues.slice(0);
     const finalPrices = [];
-    for (i = 0; i < finalActiveValues.length; i++) {
-      finalPrices.push(this.costPerKwH(finalPassiveValues[i]+finalActiveValues[i], i+1));
+    for (i = 0; i < activeValues.length; i++) {
+      finalPrices.push(this.costPerKwH(passiveValues[i]+activeValues[i], i+1));
     }
     const labels = _.range(1, initialValues.length+1);
     return {
@@ -55,6 +55,6 @@ export default class ChartPrice extends Component {
 
 ChartPrice.propTypes = {
   initialValues: PropTypes.arrayOf(PropTypes.number),
-  finalActiveValues: PropTypes.arrayOf(PropTypes.number),
-  finalPassiveValues: PropTypes.arrayOf(PropTypes.number),
+  activeValues: PropTypes.arrayOf(PropTypes.number),
+  passiveValues: PropTypes.arrayOf(PropTypes.number),
 };

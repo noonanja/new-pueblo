@@ -30,9 +30,3 @@ class LoadsCollection extends Mongo.Collection {
 export const Loads = new LoadsCollection('loads', { connection: null } );
 
 Loads.attachSchema(Schema.loads);
-
-Loads.deny({
-  insert() { return true; },
-  update() { return true; },
-  remove() { return true; },
-});

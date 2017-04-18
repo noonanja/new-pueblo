@@ -1,26 +1,26 @@
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
+import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 
-import { Users } from '../users/users.js';
-import { Loads } from '../loads/loads.js';
 import { Simulations } from './simulations.js';
 
 import { Schema } from '../schema.js';
 
-
-export const setSim = new ValidatedMethod({
-  name: 'simulations.setSim',
+export const insert = new ValidatedMethod({
+  name: 'simulations.start',
   validate: new SimpleSchema({
     formInput: {type: Schema.formInput},
-    passiveLoadValues: {type: [Number], decimal: true},
+    passiveLoad: {type: Schema.aggLoads},
+    activeLoad: {type: Schema.aggLoads},
+    activeLoads: {type: [Schema.loads]},
   }).validator(),
-  run({formInput, passiveLoadValues}) {
+  run({formInput, passiveLoad, activeLoad, activeLoads}) {
     return Simulations.insert({
       name: 'sim',
       timestamp: new Date().getTime(),
       requirements: formInput,
-      passiveLoadValues: passiveLoadValues,
-      activeAggLoad: null,
-      activeLoads: null,
+      passiveLoad: passiveLoad,
+      activeLoad: activeLoad,
+      activeLoads: activeLoads,
     });
   },
 });
@@ -29,22 +29,11 @@ export const simulate = new ValidatedMethod({
   name: 'simulations.simulate',
   validate: new SimpleSchema({
     simId: { type: String, regEx: SimpleSchema.RegEx.Id },
-    activeAggLoad: {type: [Number], decimal: true},
-    activeLoads: {type: [Schema.loads]},
   }).validator(),
   run({simId, activeAggLoad, activeLoads}) {
     if (this.isSimulation) {
       // client only code
     } else {
-      Simulations.update(
-        {_id: simId},
-        {
-          $set: {
-            activeAggLoad: activeAggLoad,
-            activeLoads: activeLoads,
-          }
-        }
-      );
       _execSync(simId, simUpdateLoads, simErr);
     }
   },
@@ -72,3 +61,21 @@ const simErr = function(_data, simId) {
     }
   );
 };
+
+// Get list of all method names on simulations
+const SIMULATIONS_METHODS = _.pluck([
+  insert,
+  simulate,
+], 'name');
+
+if (Meteor.isServer) {
+  // Only allow 1 list operations per connection per 5 seconds
+  DDPRateLimiter.addRule({
+    name(name) {
+      return _.contains(SIMULATIONS_METHODS, name);
+    },
+
+    // Rate limit per connection ID
+    connectionId() { return true; },
+  }, 1, 5000);
+}
