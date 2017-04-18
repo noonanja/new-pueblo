@@ -17,7 +17,7 @@ FlowRouter.route('/simulation/:_id', {
 FlowRouter.route('/', {
   name: 'App.home',
   action() {
-    mount(AppContainer, { header: <Header />, main: <Main /> });
+    mount(AppContainer, { header: <Header />, main: <Main params={{}}/> });
   },
 });
 

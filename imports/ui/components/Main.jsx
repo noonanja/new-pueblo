@@ -8,6 +8,10 @@ import { Meteor } from 'meteor/meteor';
 // the createContainer Higher Order Component
 import { createContainer } from 'meteor/react-meteor-data';
 
+// Server-side collection we are subscribed to
+import { Simulations } from  '../../api/simulations/simulations.js';
+
+// Local collections
 import { Users }    from '../../api/users/users.js';
 import { AggLoads } from '../../api/aggLoads/aggLoads.js';
 import { Loads } from '../../api/loads/loads.js';
@@ -295,17 +299,16 @@ export default MainContainer = createContainer(({ params }) => {
   const finalActiveLoad = AggLoads.findOne({initial: false, active: true});
   const finalActiveLoadExists = !loading && !!finalActiveLoad;
 
-  const activeLoads = Loads.find({ $or: [{hasStore: true}, {hasGen: true}] }).fetch();
-
-  // const simulationsHandle = Meteor.subscribe('simulations');
-  // const console
-  console.log(params);
+  const simulationsHandle = Meteor.subscribe('simulations', params._id);
+  const simulationLoading = !simulationsHandle.ready();
+  const simulation = Simulations.findOne(params._id);
+  const simulationExists = !simulationLoading && !!simulation;
 
   return {
     loading,
     initialLoad: initialLoadExists    ? {n: initialLoad.n, values: initialLoad.l} : { n: 0, values: [] },
     finalPassiveLoad: finalPassiveLoadExists ? {n: finalPassiveLoad.n, values: finalPassiveLoad.l} : { n: 0, values: [] },
     finalActiveLoad: finalActiveLoadExists  ? {n: finalActiveLoad.n, values: finalActiveLoad.l} : { n: 0, values: [] },
-    activeLoads: activeLoads,
+    activeLoads: simulationExists ? simulation.activeLoads : []
   };
 }, Main);
