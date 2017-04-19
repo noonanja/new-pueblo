@@ -16,41 +16,16 @@ export const partition = new ValidatedMethod({
   }).validator(),
   run({userTypes}) {
     // reset all users to passive users
-    const x = Users.update(
-      { $or: [{hasStore: true}, {hasGen: true}] },
-      {
-        $set: {hasStore: false, hasGen: false},
-      },
-      { multi: true, }
-    );
-    console.log(x);
-
-    // insert storer-generators
-    const sgConvert = userTypes[0];
-    addActive(sgConvert, true, true);
-
-    // insert storers
-    const sConvert = userTypes[1] - userTypes[0];
-    addActive(sConvert, true, false);
-
-    // insert generators
-    const gConvert = userTypes[2] - userTypes[1];
-    addActive(gConvert, false, true);
-
+    Users.update({$or: [{hasStore: true}, {hasGen: true}]}, {$set: {hasStore: false, hasGen: false}}, { multi: true });
+    const toConvert = Users.find({hasStore: false, hasGen: false}, {limit: Math.abs(userTypes[2])}).map(function(doc) {
+      return doc._id;
+    });
+    Users.update({_id: {$in: toConvert.slice(0,  userTypes[0])}},           {$set: {hasStore: true,  hasGen: true}});
+    Users.update({_id: {$in: toConvert.slice(userTypes[0], userTypes[1])}}, {$set: {hasStore: true,  hasGen: false}});
+    Users.update({_id: {$in: toConvert.slice(userTypes[1], userTypes[2])}}, {$set: {hasStore: false, hasGen: true}});
   },
 });
 
-const addActive = function(count, hasStore, hasGen) {
-  if (count < 0) {
-    throw new Meteor.Error('Can only create active users from addActive');
-  }
-  const toConvert = Users.find({hasStore: false, hasGen: false}, {limit: Math.abs(count)}).map(function(doc) {
-    return doc._id;
-  });
-  toConvert.forEach(function(id) {
-    Users.update({_id: id}, {$set: {hasStore: hasStore, hasGen: hasGen}});
-  });
-}
 
 // Get list of all method names on simulations
 const USERS_METHODS = _.pluck([

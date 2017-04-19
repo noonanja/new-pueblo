@@ -246,22 +246,21 @@ class Main extends Component {
     // Partition the passive users into active and passive users
     // using the local mongo collections
     partition.call({userTypes: this.state.userTypes});
+
+    // Simulate the partition exists in the local Users, Loads, and AggLoads collections
     const passiveLoad = AggLoads.findOne({initial: false, active: false});
     const activeLoad  = AggLoads.findOne({active: true});
-    const activeLoads = Loads.find({$or: [{hasStore: true, hasGen: true}]}).fetch();
-
+    const activeLoads = Loads.find({$or: [{hasStore: true}, {hasGen: true}]}).fetch();
     insert.call({formInput: this.state, passiveLoad: passiveLoad, activeLoad: activeLoad, activeLoads: activeLoads}, (err, res) => {
       if (err) {
         alert(err);
       }
       if (res) {
         FlowRouter.go(`/simulation/${res}`);
-        simulate.call({ simId: res, });
+        // simulate.call({ simId: res, });
        }
-      }
-    );
+    });
   }
-
 }
 
 Main.propTypes = {

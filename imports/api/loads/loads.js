@@ -13,10 +13,8 @@ class LoadsCollection extends Mongo.Collection {
     return result;
   }
   update(selector, modifier) {
-    // remove this load from the aggregation
     denormalizers.beforeUpdateLoads(selector, modifier);
     const result = super.update(selector, modifier);
-    // add the updated load back to the aggregation
     denormalizers.afterUpdateLoads(selector, modifier);
     return result;
   }

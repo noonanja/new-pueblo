@@ -69,12 +69,15 @@ export const denormalizers = {
       sDCentroid: i,
     });
   },
+  beforeUpdateUsers(modifier) {
+    check(modifier, { $set: Object });
+  },
   afterUpdateUsers(selector, modifier) {
     Users.find(selector).map(function(user) {
       Loads.update(
         { userId: user._id },
         {
-          $set: {hasStore: user.hasStore, hasGen: user.hasGen }
+          $set: {hasStore: modifier.$set.hasStore, hasGen: modifier.$set.hasGen }
         }
       );
     });
