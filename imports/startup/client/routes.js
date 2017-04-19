@@ -5,6 +5,7 @@ import { mount } from 'react-mounter';
 import AppContainer from '../../ui/AppContainer.jsx';
 import Header from '../../ui/components/Header.jsx';
 import Main from '../../ui/components/Main.jsx';
+import About from '../../ui/components/About.jsx';
 import NotFound from '../../ui/components/NotFound.jsx';
 
 
@@ -25,7 +26,7 @@ FlowRouter.route('/simulation/:_id', {
 FlowRouter.route('/about', {
   name: 'App.about',
   action() {
-    mount(AppContainer, { header: <Header page={"about"}/>, main: <Main params={{}}/> });
+    mount(AppContainer, { header: <Header page={"about"}/>, main: <About /> });
   },
 });
 
