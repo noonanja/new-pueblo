@@ -184,7 +184,7 @@ class Main extends Component {
   }
 
   renderSimulate() {
-    return this.props.loading ? this.renderLoading() : this.renderSubmit()
+    return this.props.simulationLoading ? this.renderLoading() : this.renderSubmit()
   }
 
   render() {
@@ -257,14 +257,14 @@ class Main extends Component {
       }
       if (res) {
         FlowRouter.go(`/simulation/${res}`);
-        // simulate.call({ simId: res, });
+        simulate.call({ simId: res, });
        }
     });
   }
 }
 
 Main.propTypes = {
-  loading: PropTypes.bool,
+  simulationLoading: PropTypes.bool,
   initialLoad: PropTypes.object,
   passiveLoad: PropTypes.object,
   activeLoad: PropTypes.object,

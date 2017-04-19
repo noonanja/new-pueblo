@@ -40,18 +40,11 @@ export const simulate = new ValidatedMethod({
 });
 
 const simUpdateLoads = function(_data, simId) {
-  // Simulations.update(
-  //   {_id: simId},
-  //   {
-  //     $set: {
-  //       // activeAggLoad: [69,69,69],
-  //       // activeLoads: activeLoads,
-  //     }
-  //   }
-  // );
+  console.log(_data);
 };
 
 const simErr = function(_data, simId) {
+  console.log(_data);
   Simulations.update(
     {_id: simId},
     {

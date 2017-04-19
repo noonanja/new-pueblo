@@ -81,6 +81,5 @@ Schema.publicFields.Simulations = {
   requirements: 1,
   passiveLoad: 1,
   activeLoad: 1,
-  activeLoads: 1,
   error: 1,
 };

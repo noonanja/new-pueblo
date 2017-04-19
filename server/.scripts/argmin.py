@@ -139,7 +139,7 @@ class Simulation(object):
         for i in xrange(0, 48):
             self.G[74+i][i] = -1
 
-    def storer_minimize(self, e, otherAgg, sCentroid):
+    def storer_minimize(self, e, otherAgg, sCCentroid, sDCentroid):
         """
         Objective function: argmin ~s~ { f(otherAgg) }
                             where f(otherAgg) =
@@ -152,11 +152,12 @@ class Simulation(object):
         """
         q = []
         for i in xrange(0, 47, 2): # grid prices are indexed from 1
-            q.append( 2*e[i/2]*gridK[i/2+1] + gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*sCentroid[i])
-            q.append(-2*e[i/2]*gridK[i/2+1] - gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*sCentroid[i+1])
+            q.append( 2*e[i/2]*gridK[i/2+1] + gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*sCCentroid[i/2])
+            q.append(-2*e[i/2]*gridK[i/2+1] - gridK[i/2+1]*otherAgg[i/2] - 2*self.tau*sDCentroid[i/2])
         q = np.array(q)
 
-        return solvers.qp(matrix(self.P), matrix(q), matrix(self.G), matrix(self.h))['x']
+        x = solvers.qp(matrix(self.P), matrix(q), matrix(self.G), matrix(self.h))['x']
+        return ([x[i] for j in xrange(0, len(x), 2)], [x[j] for j in xrange(1, len(x), 2)])
 
     def simulate(self, simId):
         # load = self.activeLoads[4]
@@ -164,20 +165,27 @@ class Simulation(object):
             otherActiveAgg = np.subtract(self.activeAggLoad, load['l'])
             otherAgg = np.add(self.passiveLoadValues, otherActiveAgg)
             if (load['hasStore'] and not load['hasGen']):
-                s = self.storer_minimize(load['e'], otherAgg, load['sCentroid'])
-                db.simulations.update_one( \
-                    {'_id': simId}, \
-                    {'$set': {'activeLoads.'+str(i)+'.sCCentroid': [s[j] for j in xrange(0, len(s), 2)]},\
-                              'activeLoads.'+str(i)+'.sDCentroid': [s[j] for j in xrange(1, len(s), 2)]
-                             }\
+                (sCCentroid, sDCentroid) = self.storer_minimize(load['e'], otherAgg, load['sCCentroid'], load['sDCentroid'])
+                old_load = load['l']
+                load_prime = [load['e'][j] + sCCentroid[j] - sDCentroid[j] for j in xrange(0, 24)]
+                db.simulations.update_one(
+                    {'_id': simId},
+                    {
+                        '$set': {
+                            'activeLoads.'+str(i)+'.l': load_prime,
+                            'activeLoads.'+str(i)+'.sCCentroid': sCCentroid,
+                            'activeLoads.'+str(i)+'.sDCentroid': sDCentroid,
+                            },
+                        '$inc': {
+                            'activeLoad.l.'+str(i): old_load[i] - load_prime[i] for i in xrange(0,24)
+                        }
+                    }
                 )
-                # print load['userId']
-                # print load['hasStore']
-                # print load['hasGen']
-                # print "charged", sum([s[i] for i in xrange(0, len(s), 2)])
-                # print "discharged", sum([s[i] for i in xrange(1, len(s)-1, 2)])
-                print s
-                sys.stdout.flush()
+                print "sCCentroid", sCCentroid
+                print "sDCentroid", sDCentroid
+        sys.stdout.flush()
+
+
 
 
 def main(args):
@@ -193,8 +201,8 @@ def main(args):
                             float(requirements['maxHourlyProduction']),
                             float(requirements['maxDailyProduction']),
 
-                            sim['passiveLoadValues'],
-                            sim['activeAggLoad'],
+                            sim['passiveLoad']['l'],
+                            sim['activeLoad']['l'],
                             sim['activeLoads']
                             )
     simulation.simulate(args[1])
@@ -202,4 +210,4 @@ def main(args):
 
 if __name__ == "__main__":
     # main(sys.argv)
-    main(["blank", "R5ZntkFWqujhHMbDR"])
+    main(["blank", "o4e6vfJ6FgAnGCgA6"])
