@@ -3,37 +3,40 @@ import PropTypes from 'prop-types';
 
 import { Meteor } from 'meteor/meteor';
 
-// to use react-meteor-data (allowing us to use data from a Meteor collection
-// inside a React component), we need to wrap our component in a container using
-// the createContainer Higher Order Component
-import { createContainer } from 'meteor/react-meteor-data';
+// Insertions on the client-side of Users triggers the insertion of
+// corresponding Loads, which are aggregated in the local AggLoads Collection
+// for graphical display
+import { AggLoads } from '../../api/aggLoads/aggLoads.js';
 
-// Server-side collection we are subscribed to
+// A Method run on the client-side over the local Collections to prepare user
+// input for the simulation
+import { partition } from '../../api/users/methods.js';
+
+// Simulations: Server-side collection we are subscribed to. Corresponding Methods
 import { Simulations } from  '../../api/simulations/simulations.js';
 import {
   insert,
   simulate,
 } from '../../api/simulations/methods.js';
-import { partition } from '../../api/users/methods.js';
 
-// Local collections
-import { Users }    from '../../api/users/users.js';
-import { AggLoads } from '../../api/aggLoads/aggLoads.js';
-import { Loads } from '../../api/loads/loads.js';
+// To use data from the Simulations we subscribe to inside a React component, we need
+// to wrap our component in a container using the createContainer Higher Order Component
+import { createContainer } from 'meteor/react-meteor-data';
 
-import ChartUsers from '../components/ChartUsers.jsx';
+// Chart Components renderered with data from AggLoads and Simulations
 import ChartAgg from '../components/ChartAgg.jsx';
 import ChartPrice from '../components/ChartPrice.jsx';
 
-// Contraints for DERs drawn from paper
+// Contraints for DERs drawn from scholarly paper
 import { Constraints } from '/lib/constraints.js';
 
-// Range slider component
+// Range slider component and doughnut to visualize user partition
 import Range from 'rc-slider/lib/Range';
 import Slider from 'rc-slider';
 const Handle = Slider.Handle;
 const Tooltip = require('rc-tooltip');
 import 'rc-slider/assets/index.css';
+import ChartUsers from '../components/ChartUsers.jsx';
 
 const userCount = Constraints.userCount;
 const maxActive = Constraints.maxActive;
@@ -41,7 +44,6 @@ const marks = {0: '0'};
 marks[maxActive]= `${maxActive}`;
 
 
-// App component - represents the whole app
 class Main extends Component {
   constructor(props) {
     super(props);
@@ -247,7 +249,8 @@ class Main extends Component {
     // using the local mongo collections
     partition.call({userTypes: this.state.userTypes});
 
-    // Simulate the partition exists in the local Users, Loads, and AggLoads collections
+    // Simulate the partition that exists in the local Users, Loads, and AggLoads collections
+    // while considering the battery and storage constraints specified by the app State
     const passiveLoad = AggLoads.findOne({initial: false, active: false});
     const activeLoad  = AggLoads.findOne({active: true});
     const activeLoads = Loads.find({$or: [{hasStore: true}, {hasGen: true}]}).fetch();
@@ -271,7 +274,7 @@ Main.propTypes = {
 };
 
 export default MainContainer = createContainer(({ params }) => {
-  const initialLoad = AggLoads.findOne({initial: true});
+  const initialLoad = AggLoads.findOne({initial: true}); // to compare against the simulation output
 
   const simulationsHandle = Meteor.subscribe('simulations', params._id);
   const simulationLoading = !simulationsHandle.ready();

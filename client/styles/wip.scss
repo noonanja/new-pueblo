@@ -41,10 +41,21 @@ body {
 }
 
 #main-nav a {
-  color: $nav-text-color;
   text-decoration: none;
   letter-spacing: 1.5px;
   padding: 0 .8em
+}
+
+a.onPage {
+  color: $nav-onPage-color;
+}
+a.onPage:hover {
+  color: $nav-onPage-color;
+}
+
+
+a.offPage {
+  color: $nav-offPage-color;
 }
 
 .graph-header {

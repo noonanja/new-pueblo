@@ -168,19 +168,19 @@ class Simulation(object):
                 (sCCentroid, sDCentroid) = self.storer_minimize(load['e'], otherAgg, load['sCCentroid'], load['sDCentroid'])
                 old_load = load['l']
                 load_prime = [load['e'][j] + sCCentroid[j] - sDCentroid[j] for j in xrange(0, 24)]
-                db.simulations.update_one(
-                    {'_id': simId},
-                    {
-                        '$set': {
-                            'activeLoads.'+str(i)+'.l': load_prime,
-                            'activeLoads.'+str(i)+'.sCCentroid': sCCentroid,
-                            'activeLoads.'+str(i)+'.sDCentroid': sDCentroid,
-                            },
-                        '$inc': {
-                            'activeLoad.l.'+str(i): old_load[i] - load_prime[i] for i in xrange(0,24)
-                        }
-                    }
-                )
+                # db.simulations.update_one(
+                #     {'_id': simId},
+                #     {
+                #         '$set': {
+                #             'activeLoads.'+str(i)+'.l': load_prime,
+                #             'activeLoads.'+str(i)+'.sCCentroid': sCCentroid,
+                #             'activeLoads.'+str(i)+'.sDCentroid': sDCentroid,
+                #             },
+                #         '$inc': {
+                #             'activeLoad.l.'+str(i): old_load[i] - load_prime[i] for i in xrange(0,24)
+                #         }
+                #     }
+                # )
                 print "sCCentroid", sCCentroid
                 print "sDCentroid", sDCentroid
         sys.stdout.flush()
@@ -210,4 +210,4 @@ def main(args):
 
 if __name__ == "__main__":
     # main(sys.argv)
-    main(["blank", "o4e6vfJ6FgAnGCgA6"])
+    main(["blank", "jKNW9yPbMdaAg325o"])
